@@ -1,16 +1,10 @@
-# tmp
+# Soundest - это сервис для облачного хранения музыки и воспроизведения ее прямо из облака *(находится в разработке)*.
+**Это репозиторий Flutter приложения этого сервиса.**
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Пользователь может хранить музыку в облаке и воспроизводить ее оттуда, задавать ей название и исполнителя, создавать плейлисты и добавлять музыку в них. Фишка в том, что этот сервис имеет как веб версию, так и мобильное приложение. То есть пользователь может загрузить музыку, например, на пк, а слушать ее как на пк, так и на телефоне. Или наоборот, загрузить с телефона. Это хорошо тем, что пользователь будет иметь единое место для своей музыке. Также при утере, например, телефона, вся музыка будет сохранена, ведь она хранится в облаке.
+## Используемые технологии
+- Dart
+- Flutter
+- Firebase
+  
+*Конкретно приложение проекта в данный момент находится в разработке, поэтому скачать можно пока только исходный код.*
