@@ -8,13 +8,15 @@ import 'components/player.dart';
 import 'components/item.dart';
 
 class Home extends StatefulWidget{
-  const Home({super.key});
+  const Home({super.key, required this.login});
+  final login;
 
-  State<Home> createState() => _Home();
+  State<Home> createState() => _Home(login: login);
 }
 
 class _Home extends State<Home>{
-  final login = 'suvorovmatvej9';
+  _Home({this.login});
+  final login;
   final player = AssetsAudioPlayer();
 
   late Future<List<Map>> items = getItems(login);
@@ -111,7 +113,10 @@ class _Home extends State<Home>{
                       ];
                     } else {
                       children = [
-                        const Center(child: CircularProgressIndicator())
+                        const Align(
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator()
+                        )
                       ];
                     }
                     return Column(
