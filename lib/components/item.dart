@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-
+import '../services/fetchItems.dart';
 
 class Item extends StatelessWidget{
-  const Item({super.key, required this.item, this.remove, this.setSong});
+  const Item({super.key, required this.item, required this.remove, required this.setSong, required this.uploadItem});
   final item;
   final remove;
   final setSong;
+  final uploadItem;
 
   @override
   Widget build(BuildContext context){
@@ -38,6 +39,12 @@ class Item extends StatelessWidget{
               PopupMenuButton(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 itemBuilder: (BuildContext context) => [
+                    if (item.containsKey('path'))
+                      PopupMenuItem(
+                        value: 1,
+                        child: Text('Загрузить в облако'),
+                        onTap: () => uploadItem(item),
+                      ),
                     PopupMenuItem(
                       value: 1,
                       child: Text('Добавить в плейлист'),

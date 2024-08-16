@@ -1,15 +1,16 @@
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import './signin.dart';
 import './home.dart';
 import './playlists.dart';
+import './services/fetchItems.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:file_picker/file_picker.dart';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:math';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,28 +86,6 @@ class _NavBar extends State<NavBar>{
     });
   }
 
-  void uploadFiles() async {
-    final songID = 1 + Random().nextInt(9999999999999 - 1);
-
-    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true, type: FileType.audio);
-    if (result != null){
-      List<File?> files = result.paths.map((path) => File(path!)).toList();
-
-      final storageRef = FirebaseStorage.instance.ref();
-      final DatabaseReference ref = FirebaseDatabase.instance.ref();
-      files.forEach((file) async {
-        if (file != null){
-          final fileRef = storageRef.child('$username/$songID.mp3');
-          await fileRef.putFile(file);
-          await ref.set({
-
-          });
-        }
-      });
-    }
-
-  }
-
   void onTap (int index){
     setState((){
       page = index;
@@ -127,10 +106,6 @@ class _NavBar extends State<NavBar>{
           Builder(builder: (BuildContext context) {
             if (isSigned == true) {
               return PopupMenuButton(itemBuilder: (BuildContext context) => [
-                PopupMenuItem(
-                  onTap: uploadFiles,
-                  child: const Text('Загрузить музыку')
-                ),
                 PopupMenuItem(
                   onTap: logout,
                   child: const Text('Выйти из аккаунта')

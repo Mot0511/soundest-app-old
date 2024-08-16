@@ -1,24 +1,36 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:math';
+import 'dart:io';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:media_storage/media_storage.dart';
+import 'package:path/path.dart' as path;
 
-Future<List<Audio>> getQueue(Map firstItem, List<Map> items, String login) async {
-  final id = firstItem['id'];
+void uploadSong(Map item, Future<List<Map>> oldItems, String username) async {
+    final items = await oldItems;
+    final file = File(item['path']);
+    final songID = 1 + Random().nextInt(4294967296 - 1);
 
-  List<Audio> queue = [];
-  items.forEach((item) async {
-    queue.add(Audio(await getUrl('$login/$id.mp3')));
-  });
+    final storageRef = FirebaseStorage.instance.ref();
+    final fileRef = storageRef.child('$username/$songID.mp3');
+    await fileRef.putFile(file);
 
-  for (var i = 0; i < queue.length; i++){
-    if (queue[i].path == firstItem['url']){
-      queue.removeAt(i);
-    }
-  }
-  
-  queue.insert(0, Audio.network(await getUrl('$login/$id.mp3')));
+    final title = item['title'];
+    final author = item['author'];
+    final newpath = path.join(path.dirname(file.path), '$title@$author.mp3');
+    file.renameSync(newpath);
 
-  return queue;
+    final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$username/songs/');
+    final Map<String, dynamic> newItem = {
+      'id': songID,
+      'title': item['title'],
+      'author': item['author'],
+    };
+    items.add(newItem);
+    await ref.set(items);
 }
 
 Future<List<Map>> getItems(String login) async {
@@ -38,7 +50,31 @@ Future<List<Map>> getItems(String login) async {
     });
   }
 
-  return res;
+  final path = await MediaStorage.getExternalStoragePublicDirectory(MediaStorage.DIRECTORY_MUSIC);
+  final bool isPermission = await MediaStorage.getRequestStoragePermission();
+  if (isPermission){
+    final List media = await MediaStorage.getMediaStoreData(path);
+    media.forEach((song) {
+      if (song['media_type'] == 2){
+        res.add({
+          'title': song['displayName'],
+          'author': '',
+          'path': song['filepath']
+        });
+      }
+    });
+
+  } else {
+    await MediaStorage.getRequestStoragePermission();
+  }
+
+
+  Iterable isReverse = res.reversed;
+  List<Map> items = (isReverse.toList() as List<Map>);
+  print('-------------------');
+  print(items);
+
+  return items;
 }
 
 void uploadItems(String login, Future<List<Map>> items) async {

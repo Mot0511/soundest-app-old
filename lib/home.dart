@@ -15,11 +15,11 @@ class Home extends StatefulWidget{
 }
 
 class _Home extends State<Home>{
-  _Home({this.login});
+  _Home({required this.login});
   final login;
   final player = AssetsAudioPlayer();
-
   late Future<List<Map>> items = getItems(login);
+
   int step = 0;
   String url = '';
   bool isPlay = false;
@@ -43,35 +43,58 @@ class _Home extends State<Home>{
     setSong(data[step]);
   }
   void setSong(Map item) async {
-    
-    final id = item['id'];
-    final newUrl = await getUrl('$login/$id.mp3');
-    player.open(
-      Audio.network(newUrl, metas: Metas(
-        title: item['title'],
-        artist: item['author'],
-        image: const MetasImage.asset("assets/images/icon.png")
-      )),
-      showNotification: true,
-      notificationSettings: NotificationSettings(
-        prevEnabled: false,
-        customNextAction: (player) {
-          leaf();
-        }
-      )
+
+    final metas = Metas(
+      title: item['title'],
+      artist: item['author'],
+      image: const MetasImage.asset("assets/images/icon.png")
     );
-    List<Map> data = await items;
-    for (var i = 0; i < data.length; i++){
-    if (data[i]['id'] == item['id']){
+
+    final notificationSettings = NotificationSettings(
+      prevEnabled: false,
+      customNextAction: (player) {
+        leaf();
+      }
+    );
+
+    if (item.containsKey('path')){
+      player.open(
+        Audio.file(item['path'], metas: metas),
+        showNotification: true,
+        notificationSettings: notificationSettings
+      );
+      List<Map> data = await items;
+      for (var i = 0; i < data.length; i++){
+      if (data[i]['path'] == item['path']){
           setState(() {
             step = i;
             isPlay = true;
-            url = newUrl;
+            url = item['path'];
           });
           break;
+        }
+      }
+      
+    } else {
+      final id = item['id'];
+      final newUrl = await getUrl('$login/$id.mp3');
+      player.open(
+        Audio.network(newUrl, metas: metas),
+        showNotification: true,
+        notificationSettings: notificationSettings
+      );
+      List<Map> data = await items;
+      for (var i = 0; i < data.length; i++){
+      if (data[i]['id'] == item['id']){
+            setState(() {
+              step = i;
+              isPlay = true;
+              url = newUrl;
+            });
+            break;
+        }
       }
     }
-
     player.playlistAudioFinished.listen((_) => leaf());
     player.current.listen((currentSong) => setState(() => duration = currentSong!.audio.duration.inSeconds.toDouble()));
   }
@@ -90,6 +113,10 @@ class _Home extends State<Home>{
     }
   }
 
+  void uploadItem(Map item) {
+    uploadSong(item, items, login);
+  }
+
   @override
   Widget build(BuildContext context){
     return Column (
@@ -105,11 +132,11 @@ class _Home extends State<Home>{
                     List<Widget> children;
                     if (snapshot.hasData){
                       final data = snapshot.data;
-                      children = List.generate(data!.length, (index) => Item(item: data[index], remove: remove, setSong: setSong));
+                      children = List.generate(data!.length, (index) => Item(item: data[index], remove: remove, setSong: setSong, uploadItem: uploadItem));
                     } else if (snapshot.hasError){
                       final error = snapshot.error;
                       children = [
-                        Center(child: Text('Произошла ошибка: $error', style: const TextStyle(fontSize: 30)))
+                        Center(child: Text('Произошла ошибка: $error', style: const TextStyle(fontSize: 20)))
                       ];
                     } else {
                       children = [
