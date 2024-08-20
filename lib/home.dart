@@ -136,7 +136,7 @@ class _Home extends State<Home>{
                     } else if (snapshot.hasError){
                       final error = snapshot.error;
                       children = [
-                        Center(child: Text('Произошла ошибка: $error', style: const TextStyle(fontSize: 20)))
+                        Center(child: Text('$error', style: const TextStyle(fontSize: 20)))
                       ];
                     } else {
                       children = [

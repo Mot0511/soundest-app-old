@@ -55,9 +55,11 @@ Future<List<Map>> getItems(String login) async {
   if (isPermission){
     final List media = await MediaStorage.getMediaStoreData(path);
     media.forEach((song) {
+      final title = song['displayName'].split('@')[0];
+      final author = song['displayName'].split('@')[1];
       if (song['media_type'] == 2){
         res.add({
-          'title': song['displayName'],
+          'title': title,
           'author': '',
           'path': song['filepath']
         });

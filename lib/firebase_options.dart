@@ -67,6 +67,7 @@ class DefaultFirebaseOptions {
     projectId: 'soundest-95e52',
     databaseURL: 'https://soundest-95e52-default-rtdb.firebaseio.com',
     storageBucket: 'soundest-95e52.appspot.com',
+    androidClientId: '246221281013-555fdaci6iivv995c6vp51frn3gpgdqe.apps.googleusercontent.com',
     iosClientId: '246221281013-6148atghuqrssa96md7dub6uvt2na8ei.apps.googleusercontent.com',
     iosBundleId: 'com.example.tmp',
   );
@@ -78,6 +79,7 @@ class DefaultFirebaseOptions {
     projectId: 'soundest-95e52',
     databaseURL: 'https://soundest-95e52-default-rtdb.firebaseio.com',
     storageBucket: 'soundest-95e52.appspot.com',
+    androidClientId: '246221281013-555fdaci6iivv995c6vp51frn3gpgdqe.apps.googleusercontent.com',
     iosClientId: '246221281013-6148atghuqrssa96md7dub6uvt2na8ei.apps.googleusercontent.com',
     iosBundleId: 'com.example.tmp',
   );
