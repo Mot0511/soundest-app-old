@@ -1,6 +1,6 @@
 {
-    "name": "tmp",
-    "short_name": "tmp",
+    "name": "sndst",
+    "short_name": "sndst",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

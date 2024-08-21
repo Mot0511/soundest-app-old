@@ -25,7 +25,7 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username) async {
 
     final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$username/songs/');
     final Map<String, dynamic> newItem = {
-      'id': songID,
+      'id': item['id'],
       'title': item['title'],
       'author': item['author'],
     };
@@ -55,14 +55,35 @@ Future<List<Map>> getItems(String login) async {
   if (isPermission){
     final List media = await MediaStorage.getMediaStoreData(path);
     media.forEach((song) {
-      final title = song['displayName'].split('@')[0];
-      final author = song['displayName'].split('@')[1];
       if (song['media_type'] == 2){
-        res.add({
-          'title': title,
-          'author': '',
-          'path': song['filepath']
-        });
+        final songID = 1 + Random().nextInt(4294967296 - 1);
+        final displayName = song['displayName'];
+        if (displayName.indexOf('@') != -1){
+          final title = displayName.split('@')[0];
+          final author = displayName.split('@')[1].split('.')[0];
+          res.add({
+            'id': songID,
+            'title': title,
+            'author': author,
+            'path': song['filepath']
+          });
+        } else {
+          res.add({
+            'id': songID,
+            'title': displayName,
+            'author': '',
+            'path': song['filepath']
+          });
+        }
+        for (var i = 0; i < res.length; i++){
+          for (var j = 0; j < res.length; j++){
+            if (res[i]['title'] == res[j]['title'] && !res[i].containsKey('path')){
+              res[i]['path'] = res[j]['path'];
+              res.removeAt(j);
+            }
+          }
+        }
+        
       }
     });
 
@@ -71,12 +92,10 @@ Future<List<Map>> getItems(String login) async {
   }
 
 
-  Iterable isReverse = res.reversed;
-  List<Map> items = (isReverse.toList() as List<Map>);
-  print('-------------------');
-  print(items);
+  // Iterable isReverse = res.reversed;
+  // List<Map> items = (isReverse.toList() as List<Map>);
 
-  return items;
+  return res;
 }
 
 void uploadItems(String login, Future<List<Map>> items) async {
