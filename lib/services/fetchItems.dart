@@ -6,7 +6,6 @@ import 'dart:math';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:media_storage/media_storage.dart';
 import 'package:path/path.dart' as path;
 
 void uploadSong(Map item, Future<List<Map>> oldItems, String username) async {
@@ -50,52 +49,52 @@ Future<List<Map>> getItems(String login) async {
     });
   }
 
-  final path = await MediaStorage.getExternalStoragePublicDirectory(MediaStorage.DIRECTORY_MUSIC);
-  final bool isPermission = await MediaStorage.getRequestStoragePermission();
-  if (isPermission){
-    final List media = await MediaStorage.getMediaStoreData(path);
-    media.forEach((song) {
-      if (song['media_type'] == 2){
-        final songID = 1 + Random().nextInt(4294967296 - 1);
-        final displayName = song['displayName'];
-        if (displayName.indexOf('@') != -1){
-          final title = displayName.split('@')[0];
-          final author = displayName.split('@')[1].split('.')[0];
-          res.add({
-            'id': songID,
-            'title': title,
-            'author': author,
-            'path': song['filepath']
-          });
-        } else {
-          res.add({
-            'id': songID,
-            'title': displayName,
-            'author': '',
-            'path': song['filepath']
-          });
-        }
-        for (var i = 0; i < res.length; i++){
-          for (var j = 0; j < res.length; j++){
-            if (res[i]['title'] == res[j]['title'] && !res[i].containsKey('path')){
-              res[i]['path'] = res[j]['path'];
-              res.removeAt(j);
-            }
-          }
-        }
+  // final path = await MediaStorage.getExternalStoragePublicDirectory(MediaStorage.DIRECTORY_MUSIC);
+  // final bool isPermission = await MediaStorage.getRequestStoragePermission();
+  // if (isPermission){
+  //   final List media = await MediaStorage.getMediaStoreData(path);
+  //   media.forEach((song) {
+  //     if (song['media_type'] == 2){
+  //       final songID = 1 + Random().nextInt(4294967296 - 1);
+  //       final displayName = song['displayName'];
+  //       if (displayName.indexOf('@') != -1){
+  //         final title = displayName.split('@')[0];
+  //         final author = displayName.split('@')[1].split('.')[0];
+  //         res.add({
+  //           'id': songID,
+  //           'title': title,
+  //           'author': author,
+  //           'path': song['filepath']
+  //         });
+  //       } else {
+  //         res.add({
+  //           'id': songID,
+  //           'title': displayName,
+  //           'author': '',
+  //           'path': song['filepath']
+  //         });
+  //       }
+  //       for (var i = 0; i < res.length; i++){
+  //         for (var j = 0; j < res.length; j++){
+  //           if (res[i]['title'] == res[j]['title'] && !res[i].containsKey('path')){
+  //             res[i]['path'] = res[j]['path'];
+  //             res.removeAt(j);
+  //           }
+  //         }
+  //       }
         
-      }
-    });
+  //     }
+  //   });
 
-  } else {
-    await MediaStorage.getRequestStoragePermission();
-  }
+  // } else {
+  //   await MediaStorage.getRequestStoragePermission();
+  // }
 
 
-  // Iterable isReverse = res.reversed;
-  // List<Map> items = (isReverse.toList() as List<Map>);
+  Iterable isReverse = res.reversed;
+  List<Map> items = (isReverse.toList() as List<Map>);
 
-  return res;
+  return items;
 }
 
 void uploadItems(String login, Future<List<Map>> items) async {
