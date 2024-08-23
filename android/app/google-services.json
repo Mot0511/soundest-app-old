@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "246221281013-7r8j10lua75ct4dtnvn9kf7rceddcep2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.soundest",
+            "certificate_hash": "d1673c3a15b7a906f41faec0139ca185a7c5e48f"
+          }
+        },
+        {
           "client_id": "246221281013-bhc2r1k0b79qehl986q12mkt3e80dv5m.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -94,6 +102,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "246221281013-2eulul0des9jldqprm4httspfe5s91bn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ms.sndst",
+            "certificate_hash": "d1673c3a15b7a906f41faec0139ca185a7c5e48f"
+          }
+        },
         {
           "client_id": "246221281013-bhc2r1k0b79qehl986q12mkt3e80dv5m.apps.googleusercontent.com",
           "client_type": 3

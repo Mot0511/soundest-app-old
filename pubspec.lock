@@ -286,14 +286,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
-  flutter_login_vk:
-    dependency: "direct main"
-    description:
-      name: flutter_login_vk
-      sha256: "03c1e05d8b80d0892f5aeb1c74157c3c4051e198bbf33a6e4a84e544b32b8c0b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.2+1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -432,14 +424,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
-  media_storage:
-    dependency: "direct main"
-    description:
-      name: media_storage
-      sha256: "6302174814adf84e4fd723c3aad37b030a2d9394e0b91924e3863d961f435c3d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
   meta:
     dependency: transitive
     description:

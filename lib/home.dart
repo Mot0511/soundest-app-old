@@ -132,7 +132,11 @@ class _Home extends State<Home>{
                     List<Widget> children;
                     if (snapshot.hasData){
                       final data = snapshot.data;
-                      children = List.generate(data!.length, (index) => Item(item: data[index], remove: remove, setSong: setSong, uploadItem: uploadItem));
+                      if (data!.isNotEmpty){
+                        children = List.generate(data!.length, (index) => Item(item: data[index], remove: remove, setSong: setSong, uploadItem: uploadItem));
+                      } else {
+                        children = [const Text('У вас пока нет музыки', style: TextStyle(fontSize: 20))];
+                      }
                     } else if (snapshot.hasError){
                       final error = snapshot.error;
                       children = [
@@ -161,11 +165,13 @@ class _Home extends State<Home>{
             Widget children = const CircularProgressIndicator();
             if (snapshot.hasData){
               final data = snapshot.data;
-              if (data != null){
+              if (data!.isNotEmpty){
                 children = SizedBox(
                   height: 101,
                   child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
                 );
+              } else {
+                children = const SizedBox.shrink();
               }
             }
             return children;
