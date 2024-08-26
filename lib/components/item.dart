@@ -1,12 +1,45 @@
 import 'package:flutter/material.dart';
 import '../services/fetchItems.dart';
 
-class Item extends StatelessWidget{
-  const Item({super.key, required this.item, required this.remove, required this.setSong, required this.uploadItem});
+class Item extends StatefulWidget{
+  const Item({super.key, required this.login, required this.item, required this.remove, required this.setSong, required this.uploadItem});
+  final login;
   final item;
   final remove;
   final setSong;
   final uploadItem;
+
+  @override
+  State<Item> createState() => _Item(login: login, item: item, remove: remove, setSong: setSong, uploadItem: uploadItem);
+
+}
+
+class _Item extends State<Item>{
+  _Item({required this.item, required this.login, required this.remove, required this.setSong, required this.uploadItem});
+  final login;
+  final item;
+  final remove;
+  final setSong;
+  final uploadItem;
+
+  bool isLocal = false;
+  bool isUploaded = false;
+
+  void checkStates() async {
+    super.initState();
+    if (item.containsKey('path')){
+      isLocal = true;
+    }
+    if (await getIsUploaded(item['id'], login)){
+      isUploaded = true;
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    checkStates();
+  }
 
   @override
   Widget build(BuildContext context){
@@ -39,11 +72,39 @@ class Item extends StatelessWidget{
               PopupMenuButton(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 itemBuilder: (BuildContext context) => [
-                    if (item.containsKey('path'))
+                    if (!isLocal && isUploaded)
+                      PopupMenuItem(
+                        value: 1,
+                        child: Text('Скачать на устройство'),
+                        onTap: () async {
+                          await downloadItem(item, login, context);
+                          setState(() => isLocal == true);
+                        },
+                      ),
+                    if (isLocal && !isUploaded)
                       PopupMenuItem(
                         value: 1,
                         child: Text('Загрузить в облако'),
-                        onTap: () => uploadItem(item),
+                        onTap: () {
+                          uploadItem(item);
+                          setState(() => isUploaded == true);
+                        },
+                      ),
+                    if (isLocal)
+                      PopupMenuItem(
+                        value: 1,
+                        child: Text('Удалить с устройства'),
+                        onTap: () {
+                          setState(() => isLocal == false);
+                        },
+                      ),
+                    if (isUploaded)
+                      PopupMenuItem(
+                        value: 1,
+                        child: Text('Удалить из облака'),
+                        onTap: () {
+                          setState(() => isUploaded == false);
+                        },
                       ),
                     PopupMenuItem(
                       value: 1,
@@ -53,11 +114,6 @@ class Item extends StatelessWidget{
                     PopupMenuItem(
                       value: 2,
                       child: Text('Изменить название или автора'),
-                      onTap: () => remove(item['id']),
-                    ),
-                    PopupMenuItem(
-                      value: 3,
-                      child: const Text('Удалить'),
                       onTap: () => remove(item['id']),
                     ),
                 ]),

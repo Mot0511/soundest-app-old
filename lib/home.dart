@@ -133,7 +133,7 @@ class _Home extends State<Home>{
                     if (snapshot.hasData){
                       final data = snapshot.data;
                       if (data!.isNotEmpty){
-                        children = List.generate(data!.length, (index) => Item(item: data[index], remove: remove, setSong: setSong, uploadItem: uploadItem));
+                        children = List.generate(data!.length, (index) => Item(login: login, item: data[index], remove: remove, setSong: setSong, uploadItem: uploadItem));
                       } else {
                         children = [const Text('У вас пока нет музыки', style: TextStyle(fontSize: 20))];
                       }
@@ -162,7 +162,7 @@ class _Home extends State<Home>{
         FutureBuilder(
           future: items,
           builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
-            Widget children = const CircularProgressIndicator();
+            Widget children = const SizedBox.shrink();
             if (snapshot.hasData){
               final data = snapshot.data;
               if (data!.isNotEmpty){
@@ -170,8 +170,6 @@ class _Home extends State<Home>{
                   height: 101,
                   child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
                 );
-              } else {
-                children = const SizedBox.shrink();
               }
             }
             return children;
