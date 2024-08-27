@@ -145,12 +145,11 @@ void uploadItems(String login, Future<List<Map>> items) async {
   ref.set(data);
 }
 
-
-Future<List<Map>> removeItem(Future<List<Map>> items, int id, String login) async {
+Future<void> removeFromCloud(Future<List<Map>> items, int id, String login) async {
   List<Map> oldItems = await items;
 
-  final ref = FirebaseStorage.instance.ref('$login/$id.mp3');
-  await ref.delete();
+  final storageRef = FirebaseStorage.instance.ref('$login/$id.mp3');
+  await storageRef.delete();
 
   List<Map> newItems = [];
   oldItems.forEach((item) {
@@ -158,6 +157,21 @@ Future<List<Map>> removeItem(Future<List<Map>> items, int id, String login) asyn
       newItems.add(item);
     }
   });
+
+  final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$login/songs/');
+  await ref.set(newItems);
+
+}
+
+Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async { 
+  final oldItems = await items;
+  List<Map> newItems = [];
+  oldItems.forEach((item) {
+    if (item['id'] != id){
+      newItems.add(item);
+    }
+  });
+
   return newItems;
 }
 

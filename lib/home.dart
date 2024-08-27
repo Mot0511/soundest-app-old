@@ -25,15 +25,7 @@ class _Home extends State<Home>{
   bool isPlay = false;
   double duration = 0.0;
 
-  void setItems (data) {
-    setState(() {
-      items = data;
-    });
-    uploadItems(login, items);
-  }
-  void remove(id){
-    setItems(removeItem(items, id, login));
-  }
+
   void leaf() async {
     Random random = Random();
     List<Map> data = await items;
@@ -117,6 +109,17 @@ class _Home extends State<Home>{
     uploadSong(item, items, login, context);
   }
 
+  void removeFromCloud_(int id, BuildContext context) {
+    removeFromCloud(items, id, login);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Трек удален из облака')));
+  }
+
+  void removeItem(int id) async {
+    setState(() {
+      items = removeItemFromList(items, id);
+    });
+  }
+
   @override
   Widget build(BuildContext context){
     return Column (
@@ -133,7 +136,7 @@ class _Home extends State<Home>{
                     if (snapshot.hasData){
                       final data = snapshot.data;
                       if (data!.isNotEmpty){
-                        children = List.generate(data!.length, (index) => Item(login: login, item: data[index], remove: remove, setSong: setSong, uploadItem: uploadItem));
+                        children = List.generate(data!.length, (index) => Item(login: login, item: data[index], setSong: setSong, uploadItem: uploadItem, removeFromCloud_: removeFromCloud_, removeItem: removeItem));
                       } else {
                         children = [const Text('У вас пока нет музыки', style: TextStyle(fontSize: 20))];
                       }

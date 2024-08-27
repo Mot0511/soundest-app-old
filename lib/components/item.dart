@@ -4,25 +4,27 @@ import 'dart:io';
 
 
 class Item extends StatefulWidget{
-  const Item({super.key, required this.login, required this.item, required this.remove, required this.setSong, required this.uploadItem});
+  const Item({super.key, required this.login, required this.item, required this.setSong, required this.uploadItem, required this.removeFromCloud_, required this.removeItem});
   final login;
   final item;
-  final remove;
   final setSong;
   final uploadItem;
+  final removeFromCloud_;
+  final removeItem;
 
   @override
-  State<Item> createState() => _Item(login: login, item: item, remove: remove, setSong: setSong, uploadItem: uploadItem);
+  State<Item> createState() => _Item(login: login, item: item, setSong: setSong, uploadItem: uploadItem, removeFromCloud_: removeFromCloud_, removeItem: removeItem);
 
 }
 
 class _Item extends State<Item>{
-  _Item({required this.item, required this.login, required this.remove, required this.setSong, required this.uploadItem});
+  _Item({required this.item, required this.login, required this.setSong, required this.uploadItem, required this.removeFromCloud_, required this.removeItem});
   final login;
   final item;
-  final remove;
   final setSong;
   final uploadItem;
+  final removeFromCloud_;
+  final removeItem;
 
   bool isLocal = false;
   bool isUploaded = false;
@@ -103,12 +105,15 @@ class _Item extends State<Item>{
                         onTap: () {
                           final title = item['title'];
                           final author = item['author'];
-                          final file = File("/storage/enulated/0/$title@$author.mp3");
+                          final file = File("/storage/emulated/0/Music/$title@$author.mp3");
                           file.deleteSync();
                           if (!isUploaded){
-                            remove(item['id']);
+                            removeItem(item['id']);
                           }
-                          setState(() => isLocal = false);
+                          isLocal = false;
+                          item.remove('path');
+                          setState(() => {});
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Трек удален с устройства')));
                         },
                       ),
                     if (isUploaded)
@@ -116,18 +121,22 @@ class _Item extends State<Item>{
                         value: 1,
                         child: const Text('Удалить из облака'),
                         onTap: () {
+                          removeFromCloud_(item['id'], context);
+                          if (!isLocal){
+                            removeItem(item['id']);
+                          }
                           setState(() => isUploaded = false);
                         },
                       ),
                     PopupMenuItem(
                       value: 1,
                       child: const Text('Добавить в плейлист'),
-                      onTap: () => remove(item['id']),
+                      onTap: () => {},
                     ),
                     PopupMenuItem(
                       value: 2,
                       child: const Text('Изменить название или автора'),
-                      onTap: () => remove(item['id']),
+                      onTap: () => {},
                     ),
                 ]),
             ]
