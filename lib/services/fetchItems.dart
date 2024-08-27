@@ -10,6 +10,7 @@ import 'package:glob/glob.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
+import '../utils/checkInternet.dart';
 
 Future<void> downloadItem(Map item, String username, BuildContext context) async {
   final songID = item['id'];
@@ -20,11 +21,9 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   final file = File('/storage/emulated/0/Music/$title@$author.mp3');
 
   final task = fileRef.writeToFile(file);
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Скачивание началось...')));
   task.snapshotEvents.listen((snap) {
     switch (snap.state){
-      case TaskState.running:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Скачивание началось...')));
-        break;
       case TaskState.success:
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка скачана')));
         break;
@@ -35,13 +34,23 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   });
 }
 
-void uploadSong(Map item, Future<List<Map>> oldItems, String username) async {
+void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildContext context) async {
 
     final file = File(item['path']);
     final songID = item['id'];
 
     final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
-    await fileRef.putFile(file);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка загружается')));
+    await fileRef.putFile(file).snapshotEvents.listen((snap) {
+      switch (snap.state){
+        case TaskState.success:
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка загружена')));
+          break;
+        case TaskState.error:
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Произошла ошибка при загрузке')));
+          break;
+      }
+    });
 
     final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$username/songs/');
     final snap = await ref.get();
@@ -60,24 +69,32 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username) async {
     file.renameSync(newpath);
 }
 
-Future<List<Map>> getItems(String login) async {
-  DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
-  final snap = await ref.get();
-  final data = snap.value;
+Future<List<Map>> getItems(String login, BuildContext context) async {
 
   List<Map<String, dynamic>> res = [];
-  
-  if (data != null){
-    (data as List).forEach((value){
-      Map<String, dynamic> item = {};
-      (value as Map).forEach((key, value) {
-        item[key] = value;
+
+  if (await internet()){
+    DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
+    final snap = await ref.get();
+    final data = snap.value;
+
+    if (data != null){
+      (data as List).forEach((value){
+        Map<String, dynamic> item = {};
+        (value as Map).forEach((key, value) {
+          item[key] = value;
+        });
+        res.add(item);
       });
-      res.add(item);
-    });
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Отсутствует интернет соеднение')));
   }
-  final status = await Permission.storage.request();
-  if (status.isGranted) {
+  
+  final storagePermission = await Permission.storage.request();
+  final audioPermission = await Permission.audio.request();
+  final manageStoragePermission = await Permission.manageExternalStorage.request();
+  if (storagePermission.isGranted || audioPermission.isGranted && manageStoragePermission.isGranted) {
     final Directory dir = Directory('/storage/emulated/0/Music');
     final List<FileSystemEntity> entities = dir.listSync(recursive: true, followLinks: true);
     entities.forEach((entity) {
@@ -97,7 +114,7 @@ Future<List<Map>> getItems(String login) async {
         } else {
           res.add({
             'id': songID,
-            'title': displayName,
+            'title': displayName.split('.')[0],
             'author': '',
             'path': path
           });
@@ -127,6 +144,7 @@ void uploadItems(String login, Future<List<Map>> items) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
   ref.set(data);
 }
+
 
 Future<List<Map>> removeItem(Future<List<Map>> items, int id, String login) async {
   List<Map> oldItems = await items;

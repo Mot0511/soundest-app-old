@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/fetchItems.dart';
+import 'dart:io';
+
 
 class Item extends StatefulWidget{
   const Item({super.key, required this.login, required this.item, required this.remove, required this.setSong, required this.uploadItem});
@@ -64,8 +66,8 @@ class _Item extends State<Item>{
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item['title'], style: TextStyle(fontSize: 15)),
-                    Text(item['author'], style: TextStyle(fontSize: 13)),
+                    Text(item['title'], style: const TextStyle(fontSize: 15)),
+                    Text(item['author'], style: const TextStyle(fontSize: 13)),
                   ]
                 ),
               ),
@@ -75,45 +77,56 @@ class _Item extends State<Item>{
                     if (!isLocal && isUploaded)
                       PopupMenuItem(
                         value: 1,
-                        child: Text('Скачать на устройство'),
+                        child: const Text('Скачать на устройство'),
                         onTap: () async {
                           await downloadItem(item, login, context);
-                          setState(() => isLocal == true);
+                          final title = item['title'];
+                          final author = item['author'];
+                          item['path'] = '/storage/emulated/0/Music/$title@$author.mp3';
+                          isLocal = true;
+                          setState(() => {});
                         },
                       ),
                     if (isLocal && !isUploaded)
                       PopupMenuItem(
                         value: 1,
-                        child: Text('Загрузить в облако'),
+                        child: const Text('Загрузить в облако'),
                         onTap: () {
-                          uploadItem(item);
-                          setState(() => isUploaded == true);
+                          uploadItem(item, context);
+                          setState(() => isUploaded = true);
                         },
                       ),
                     if (isLocal)
                       PopupMenuItem(
                         value: 1,
-                        child: Text('Удалить с устройства'),
+                        child: const Text('Удалить с устройства'),
                         onTap: () {
-                          setState(() => isLocal == false);
+                          final title = item['title'];
+                          final author = item['author'];
+                          final file = File("/storage/enulated/0/$title@$author.mp3");
+                          file.deleteSync();
+                          if (!isUploaded){
+                            remove(item['id']);
+                          }
+                          setState(() => isLocal = false);
                         },
                       ),
                     if (isUploaded)
                       PopupMenuItem(
                         value: 1,
-                        child: Text('Удалить из облака'),
+                        child: const Text('Удалить из облака'),
                         onTap: () {
-                          setState(() => isUploaded == false);
+                          setState(() => isUploaded = false);
                         },
                       ),
                     PopupMenuItem(
                       value: 1,
-                      child: Text('Добавить в плейлист'),
+                      child: const Text('Добавить в плейлист'),
                       onTap: () => remove(item['id']),
                     ),
                     PopupMenuItem(
                       value: 2,
-                      child: Text('Изменить название или автора'),
+                      child: const Text('Изменить название или автора'),
                       onTap: () => remove(item['id']),
                     ),
                 ]),

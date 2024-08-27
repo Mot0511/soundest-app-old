@@ -18,7 +18,7 @@ class _Home extends State<Home>{
   _Home({required this.login});
   final login;
   final player = AssetsAudioPlayer();
-  late Future<List<Map>> items = getItems(login);
+  late Future<List<Map>> items = getItems(login, context);
 
   int step = 0;
   String url = '';
@@ -113,8 +113,8 @@ class _Home extends State<Home>{
     }
   }
 
-  void uploadItem(Map item) {
-    uploadSong(item, items, login);
+  void uploadItem(Map item, BuildContext context) {
+    uploadSong(item, items, login, context);
   }
 
   @override
