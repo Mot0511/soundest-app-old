@@ -21,7 +21,7 @@ class _PlaylistPage extends State<PlaylistPage>{
   final login = 'suvorovmatvej9';
   final player = AudioPlayer();
 
-  late Future<List<Map<String, dynamic>>> items = getItemsByIds(login, list);
+  late Future<List<Map>> items = getItemsByIds(login, list, context);
 
   int step = 0;
   String url = '';

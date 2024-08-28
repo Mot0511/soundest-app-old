@@ -49,8 +49,10 @@ class _EditPlaylist extends State<EditPlaylist>{
                 switch (action){
                   case 'creating':
                     updatePlaylists(action, name.text);
+                    break;
                   case 'editing':
                     updatePlaylists(action, [data, name.text]);
+                    break;
                 
                 }
                 Navigator.pop(context);
