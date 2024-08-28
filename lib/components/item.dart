@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:soundest/editItem.dart';
 import '../services/fetchItems.dart';
 import 'dart:io';
 
@@ -29,6 +30,11 @@ class _Item extends State<Item>{
   bool isLocal = false;
   bool isUploaded = false;
 
+  @override
+  void initState() {
+    checkStates();
+  }
+
   void checkStates() async {
     super.initState();
     if (item.containsKey('path')){
@@ -40,9 +46,12 @@ class _Item extends State<Item>{
     setState(() {});
   }
 
-  @override
-  void initState() {
-    checkStates();
+  void editItem_(int id, String filename, String title, String author) {
+    setState(() {
+      item['title'] = title;
+      item['author'] = author;//
+    });
+    editItem(id, login, filename, title, author);
   }
 
   @override
@@ -136,7 +145,8 @@ class _Item extends State<Item>{
                     PopupMenuItem(
                       value: 2,
                       child: const Text('Изменить название или автора'),
-                      onTap: () => {},
+                        onTap: () => Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => EditItem(data: item, editItem: editItem_))),
                     ),
                 ]),
             ]

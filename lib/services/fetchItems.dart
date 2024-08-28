@@ -21,7 +21,7 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   final file = File('/storage/emulated/0/Music/$title@$author.mp3');
 
   final task = fileRef.writeToFile(file);
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Скачивание началось...')));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка скачивается...')));
   task.snapshotEvents.listen((snap) {
     switch (snap.state){
       case TaskState.success:
@@ -40,7 +40,7 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildCont
     final songID = item['id'];
 
     final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка загружается')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка загружается...')));
     await fileRef.putFile(file).snapshotEvents.listen((snap) {
       switch (snap.state){
         case TaskState.success:
@@ -173,6 +173,29 @@ Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async {
   });
 
   return newItems;
+}
+
+void editItem(int id, String login, String filename, String title, String author) async {
+  DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
+  final snap = await ref.get();
+  final items = (snap.value as List);
+
+  for (var i = 0; i < items.length; i++){
+    if (items[i]['id'] == id){
+      items[i]['title'] = title;
+      items[i]['author'] = author;
+    }
+  }
+
+  await ref.set(items);
+
+
+  final file = File('/storage/emulated/0/Music/$filename');
+  if (file.existsSync()) {
+    final newpath = path.join(path.dirname(file.path), '$title@$author.mp3');
+    file.renameSync(newpath);
+  }
+
 }
 
 Future<String> getUrl(String path) async {

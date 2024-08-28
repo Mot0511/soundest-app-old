@@ -115,9 +115,8 @@ class _Home extends State<Home>{
   }
 
   void removeItem(int id) async {
-    setState(() {
-      items = removeItemFromList(items, id);
-    });
+    items = removeItemFromList(items, id);
+    setState(() {});
   }
 
   @override
