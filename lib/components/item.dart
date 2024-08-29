@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:soundest/components/pickPlaylist.dart';
 import 'package:soundest/editItem.dart';
 import '../services/fetchItems.dart';
 import 'dart:io';
 
 
 class Item extends StatefulWidget{
-  const Item({super.key, required this.login, required this.item, required this.setSong, required this.uploadItem, required this.removeFromCloud_, required this.removeItem});
+  const Item({super.key, required this.login, required this.item, required this.setSong, required this.type, this.uploadItem, this.removeFromCloud_, this.removeItem, this.removeFromPlaylist_});
   final login;
   final item;
   final setSong;
+  final String type;
   final uploadItem;
   final removeFromCloud_;
   final removeItem;
+  final removeFromPlaylist_;
 
   @override
-  State<Item> createState() => _Item(login: login, item: item, setSong: setSong, uploadItem: uploadItem, removeFromCloud_: removeFromCloud_, removeItem: removeItem);
+  State<Item> createState() => _Item(login: login, item: item, setSong: setSong, type: type, uploadItem: uploadItem, removeFromCloud_: removeFromCloud_, removeItem: removeItem, removeFromPlaylist_: removeFromPlaylist_);
 
 }
 
 class _Item extends State<Item>{
-  _Item({required this.item, required this.login, required this.setSong, required this.uploadItem, required this.removeFromCloud_, required this.removeItem});
+  _Item({required this.item, required this.login, required this.setSong, required this.type, this.uploadItem, this.removeFromCloud_, this.removeItem, this.removeFromPlaylist_});
   final login;
   final item;
   final setSong;
+  final String type;
   final uploadItem;
   final removeFromCloud_;
   final removeItem;
+  final removeFromPlaylist_;
 
   bool isLocal = false;
   bool isUploaded = false;
@@ -49,7 +54,7 @@ class _Item extends State<Item>{
   void editItem_(int id, String filename, String title, String author) {
     setState(() {
       item['title'] = title;
-      item['author'] = author;//
+      item['author'] = author;
     });
     editItem(id, login, filename, title, author);
   }
@@ -59,7 +64,7 @@ class _Item extends State<Item>{
     return Container(
       width: 1000,
       height: 62,
-      margin: EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         border: Border.all(
           width: 1,
@@ -70,7 +75,7 @@ class _Item extends State<Item>{
       child: InkWell (
         onTap: () => setSong(item),
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Row(
             children: [
               Expanded(
@@ -85,7 +90,7 @@ class _Item extends State<Item>{
               PopupMenuButton(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 itemBuilder: (BuildContext context) => [
-                    if (!isLocal && isUploaded)
+                    if (!isLocal && isUploaded && type != 'playlist')
                       PopupMenuItem(
                         value: 1,
                         child: const Text('Скачать на устройство'),
@@ -98,7 +103,7 @@ class _Item extends State<Item>{
                           setState(() => {});
                         },
                       ),
-                    if (isLocal && !isUploaded)
+                    if (isLocal && !isUploaded && type != 'playlist')
                       PopupMenuItem(
                         value: 1,
                         child: const Text('Загрузить в облако'),
@@ -107,7 +112,7 @@ class _Item extends State<Item>{
                           setState(() => isUploaded = true);
                         },
                       ),
-                    if (isLocal)
+                    if (isLocal && type != 'playlist')
                       PopupMenuItem(
                         value: 1,
                         child: const Text('Удалить с устройства'),
@@ -125,7 +130,7 @@ class _Item extends State<Item>{
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Трек удален с устройства')));
                         },
                       ),
-                    if (isUploaded)
+                    if (isUploaded && type != 'playlist')
                       PopupMenuItem(
                         value: 1,
                         child: const Text('Удалить из облака'),
@@ -140,8 +145,17 @@ class _Item extends State<Item>{
                     PopupMenuItem(
                       value: 1,
                       child: const Text('Добавить в плейлист'),
-                      onTap: () => {},
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (BuildContext context) => PickPlaylist(login: login, item: item)
+                      ),
                     ),
+                    if (type == 'playlist')
+                      PopupMenuItem(
+                        value: 1,
+                        child: const Text('Удалить из плейлиста'),
+                        onTap: () => removeFromPlaylist_(item['id']),
+                      ),
                     PopupMenuItem(
                       value: 2,
                       child: const Text('Изменить название или автора'),

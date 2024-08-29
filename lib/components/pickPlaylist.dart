@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
 class PickPlaylist extends StatelessWidget{
-  PickPlaylist({super.key, required this.songID, required this.login, required this.item});
-  final int songID;
+  PickPlaylist({super.key, required this.login, required this.item});
   final String login;
   final Map item;
 

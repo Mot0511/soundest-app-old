@@ -94,7 +94,7 @@ class _NavBar extends State<NavBar>{
 
   static List<Widget> Pages = <Widget>[
     Home(login: username),
-    Playlists(),
+    Playlists(login: username),
   ];
 
   @override

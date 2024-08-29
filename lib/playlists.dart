@@ -5,13 +5,15 @@ import 'package:soundest/services/fetchPlaylists.dart';
 import 'package:soundest/components/playlistItem.dart';
 
 class Playlists extends StatefulWidget{
-  const Playlists({super.key});
+  const Playlists({super.key, required this.login});
+  final String login;
   
-  State<Playlists> createState() => _Playlists();
+  State<Playlists> createState() => _Playlists(login: login);
 }
 
 class _Playlists extends State<Playlists>{
-  final login = 'suvorovmatvej9';
+  _Playlists({required this.login});
+  final String login;
   late Future<Map<String, List<int>?>> playlists = getPlaylists(login);
 
   void updatePlaylists(action, name) async {
@@ -52,12 +54,12 @@ class _Playlists extends State<Playlists>{
                 child: FutureBuilder(
                   future: playlists,
                   builder: (BuildContext context, AsyncSnapshot snap){
-                    Widget res = CircularProgressIndicator();
+                    Widget res = const Column(children: [CircularProgressIndicator()]);
                     if (snap.hasData){
                       final data = snap.data;
                       final List<Widget> elements = [];
                       data.forEach((key, value){
-                        elements.add(PlaylistItem(name: key, list: value, updatePlaylists: updatePlaylists));
+                        elements.add(PlaylistItem(name: key, list: value, updatePlaylists: updatePlaylists, login: login));
                       });
                       res = Column(
                         children: elements,

@@ -135,7 +135,7 @@ class _Home extends State<Home>{
                     if (snapshot.hasData){
                       final data = snapshot.data;
                       if (data!.isNotEmpty){
-                        children = List.generate(data!.length, (index) => Item(login: login, item: data[index], setSong: setSong, uploadItem: uploadItem, removeFromCloud_: removeFromCloud_, removeItem: removeItem));
+                        children = List.generate(data!.length, (index) => Item(login: login, item: data[index], setSong: setSong, type: 'common', uploadItem: uploadItem, removeFromCloud_: removeFromCloud_, removeItem: removeItem));
                       } else {
                         children = [const Text('У вас пока нет музыки', style: TextStyle(fontSize: 20))];
                       }

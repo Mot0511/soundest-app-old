@@ -18,10 +18,10 @@ Future<Map<String, List<int>>> getPlaylists(String login) async {
   return res;
 }
 
-Future<List<int>> getPlaylist(String login, String name) async {
+Future<List> getPlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists/$name');
   final snap = await ref.get();
-  final data = (snap.value as List<int>);
+  final data = (snap.value as List).toList();
 
   return data;
 }
@@ -39,7 +39,24 @@ List<int> addItem(List<int> list, int id) {
   return list;
 }
 
-List<int> removeItemFromPlaylist(List<int> list, int id) {
+Future<void> removeFromCloudPlaylist(int id, String login) async {
+  final DatabaseReference playlistsRef = FirebaseDatabase.instance.ref('users/$login/playlists/');
+  final snap = await playlistsRef.get();
+  final data = (snap.value as Map);
+
+  for (final el in data.entries){
+    final items = el.value.toList();
+    if (items.contains(id)){
+      items.remove(id);
+    }
+    final playlist = el.key;
+    final DatabaseReference playlistRef = FirebaseDatabase.instance.ref('users/$login/playlists/$playlist');
+    await playlistRef.set(items);
+  }
+
+}
+
+Future<List<int>> removeFromPlaylist(List<int> list, int id, String login) async {
   List<int> newList = [];
   list.forEach((item) {
     if (item != id){
@@ -47,8 +64,12 @@ List<int> removeItemFromPlaylist(List<int> list, int id) {
     }
   });
 
+  await removeFromCloudPlaylist(id, login);
+
   return newList;
 }
+
+
 
 void createPlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists');

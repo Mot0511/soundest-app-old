@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:soundest/editPlaylist.dart';
+import 'package:soundest/playlistPage.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
 class PlaylistItem extends StatelessWidget{
-  const PlaylistItem({super.key, required this.name, required this.list, this.updatePlaylists});
+  const PlaylistItem({super.key, required this.name, required this.list, this.updatePlaylists, required this.login});
   final updatePlaylists;
   final name;
   final list;
+  final login;
 
   @override
   Widget build(BuildContext context){
@@ -51,7 +54,7 @@ class PlaylistItem extends StatelessWidget{
           ]
         ),
         onTap: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PlaylistPage(name: name, list: list)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => PlaylistPage(name: name, list: list, login: login)));
         },
       )
     );

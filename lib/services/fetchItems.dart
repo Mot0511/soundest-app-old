@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import '../utils/checkInternet.dart';
+import 'package:soundest/services/fetchPlaylists.dart';
 
 Future<void> downloadItem(Map item, String username, BuildContext context) async {
   final songID = item['id'];
@@ -160,6 +161,8 @@ Future<void> removeFromCloud(Future<List<Map>> items, int id, String login) asyn
 
   final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$login/songs/');
   await ref.set(newItems);
+
+  await removeFromCloudPlaylist(id, login);
 
 }
 

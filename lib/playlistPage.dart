@@ -1,108 +1,128 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:soundest/components/item.dart';
 import 'package:soundest/home.dart';
 import 'package:soundest/services/fetchItems.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 import 'dart:math';
+import 'package:soundest/components/player.dart';
 
 class PlaylistPage extends StatefulWidget{
-  const PlaylistPage({super.key, required this.name, required this.list});
+  const PlaylistPage({super.key, required this.name, required this.list, required this.login});
   final name;
   final list;
+  final String login;
 
-  State<PlaylistPage> createState() => _PlaylistPage(name: name, list: list);
+  State<PlaylistPage> createState() => _PlaylistPage(name: name, list: list, login: login);
 }
 
 class _PlaylistPage extends State<PlaylistPage>{
-  _PlaylistPage({required this.name, required this.list});
+  _PlaylistPage({required this.name, required this.list, required this.login});
   final name;
-  final list;
-
-  final login = 'suvorovmatvej9';
-  final player = AudioPlayer();
+  List<int> list;
+  final String login;
 
   late Future<List<Map>> items = getItemsByIds(login, list, context);
 
+  final player = AssetsAudioPlayer();
   int step = 0;
   String url = '';
   bool isPlay = false;
-
-  double duration = 0;
-  double current = 0;
-
-  void remove(id, String name) async {
-    setState(() {
-      items = inFuture(removeItem(items, id, login));
-    });
-    list.remove(id);
-    setPlaylist(login, name, list);
-  }
-  Future<List<Map<String, dynamic>>> inFuture(el) async {
-    return el;
-  }
+  double duration = 0.0;
 
   void leaf() async {
-    Random random = new Random();
-    List<Map<String, dynamic>> data = await items;
+    Random random = Random();
+    List<Map> data = await items;
     setState(() {
       step = random.nextInt(data.length);
     });
-    setSong(data[step]['id']);
+    setSong(data[step]);
   }
-  void setSong(id) async {
-    player.stop();
-    final newUrl = await getUrl('$login/$id.mp3');
-    List<Map<String, dynamic>> data = await items;
-    for (var i = 0; i < data.length; i++){
-      if (data[i]['id'] == id){
+  void setSong(Map item) async {
+    final metas = Metas(
+      title: item['title'],
+      artist: item['author'],
+      image: const MetasImage.asset("assets/images/icon.png")
+    );
+
+    final notificationSettings = NotificationSettings(
+      prevEnabled: false,
+      customNextAction: (player) {
+        leaf();
+      }
+    );
+
+    if (item.containsKey('path')){
+      player.open(
+        Audio.file(item['path'], metas: metas),
+        showNotification: true,
+        notificationSettings: notificationSettings
+      );
+      List<Map> data = await items;
+      for (var i = 0; i < data.length; i++){
+      if (data[i]['path'] == item['path']){
           setState(() {
             step = i;
             isPlay = true;
-            url = newUrl;
+            url = item['path'];
           });
           break;
+        }
+      }
+      
+    } else {
+      final id = item['id'];
+      final newUrl = await getUrl('$login/$id.mp3');
+      player.open(
+        Audio.network(newUrl, metas: metas),
+        showNotification: true,
+        notificationSettings: notificationSettings
+      );
+      List<Map> data = await items;
+      for (var i = 0; i < data.length; i++){
+      if (data[i]['id'] == item['id']){
+            setState(() {
+              step = i;
+              isPlay = true;
+              url = newUrl;
+            });
+            break;
+        }
       }
     }
-    player.play(UrlSource(url));
-    player.onDurationChanged.listen((Duration  d) {
-      setState(() {
-        duration = d.inSeconds * 1.0;
-      });
-    });
-    player.onPositionChanged.listen((Duration  p) {
-      setCurrent(p.inSeconds * 1.0);
-    });
-    player.onPlayerComplete.listen((_) {
-      leaf();
-    });
+    player.playlistAudioFinished.listen((_) => leaf());
+    player.current.listen((currentSong) => setState(() => duration = currentSong!.audio.duration.inSeconds.toDouble()));
   }
 
   void play() {
-    if (isPlay){
-      player.pause();
+     if (isPlay){
       setState(() {
         isPlay = false;
       });
+      player.pause();
     } else {
-      player.resume();
       setState(() {
         isPlay = true;
-      }); 
+      });
+      player.play();
     }
   }
-  void setCurrent(double value) async {
+
+  void removeFromPlaylist_(int id) async {
+    final List<int> newList = await removeFromPlaylist(list, id, login);
     setState(() {
-      current = value;
+      list = newList;
+      items = getItemsByIds(login, newList, context);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(name)),
       body: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Column (
           children: [
             Expanded(
@@ -110,14 +130,13 @@ class _PlaylistPage extends State<PlaylistPage>{
                 return SingleChildScrollView(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                    
-                    child: FutureBuilder<List<Map<String, dynamic>>>(
+                    child: FutureBuilder<List<Map>>(
                       future: items,
-                      builder: (BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot){
+                      builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
                         List<Widget> children;
                         if (snapshot.hasData){
                           final data = snapshot.data;
-                          children = List.generate(data!.length, (index) => Item(item: data[index], remove: remove, setSong: setSong, playlist: name));
+                          children = List.generate(data!.length, (index) => Item(item: data[index], login: login, type: 'playlist', setSong: setSong, removeFromPlaylist_: removeFromPlaylist_));
                         } else if (snapshot.hasError){
                           final error = snapshot.error;
                           children = [
@@ -139,15 +158,14 @@ class _PlaylistPage extends State<PlaylistPage>{
             ),
             FutureBuilder(
               future: items,
-              builder: (BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot){
-                Widget children = const CircularProgressIndicator();
+              builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
+                Widget children = const SizedBox.shrink();
                 if (snapshot.hasData){
                   final data = snapshot.data;
-                  if (data != null){
+                  if (data!.isNotEmpty){
                     children = SizedBox(
                       height: 101,
-                      child: data.length > 0 ? Player(item: data[step], player: player, leaf: leaf, play: play, isPlay: isPlay, current: current, duration: duration, setCurrent: setCurrent) : Text('Плейлист пустой', style: TextStyle(fontSize: 24))
-                      
+                      child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
                     );
                   }
                 }
