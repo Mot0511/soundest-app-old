@@ -92,10 +92,10 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Отсутствует интернет соеднение')));
   }
   
-  final storagePermission = await Permission.storage.request();
-  final audioPermission = await Permission.audio.request();
-  final manageStoragePermission = await Permission.manageExternalStorage.request();
-  if (storagePermission.isGranted || audioPermission.isGranted && manageStoragePermission.isGranted) {
+  final storagePermission = await Permission.storage.request().isGranted;
+  final audioPermission = await Permission.audio.request().isGranted;
+  final manageStoragePermission = await Permission.manageExternalStorage.request().isGranted;
+  if (storagePermission || audioPermission && manageStoragePermission) {
     final Directory dir = Directory('/storage/emulated/0/Music');
     final List<FileSystemEntity> entities = dir.listSync(recursive: true, followLinks: true);
     entities.forEach((entity) {
