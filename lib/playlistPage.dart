@@ -110,7 +110,7 @@ class _PlaylistPage extends State<PlaylistPage>{
   }
 
   void removeFromPlaylist_(int id) async {
-    final List<int> newList = await removeFromPlaylist(list, id, login);
+    final List<int> newList = await removeFromPlaylist(list, id, login, name);
     setState(() {
       list = newList;
       items = getItemsByIds(login, newList, context);

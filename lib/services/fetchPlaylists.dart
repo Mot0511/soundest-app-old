@@ -1,19 +1,61 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:soundest/services/fetchItems.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:soundest/utils/checkInternet.dart';
 
-Future<Map<String, List<int>>> getPlaylists(String login) async {
-  DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists');
-  final snap = await ref.get();
-  final data = snap.value;
-  Map<String, List<int>> res = {};
+Future<Map<String, List>> getPlaylists(String login) async {
+  Map<String, List> playlists = {};
+  if (await internet()){
+    DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists');
+    final snap = await ref.get();
+    final data = snap.value;
 
-  if (data != null){
-    (data as Map).forEach((key, value){
-      List<int> list = List.from(value);
-      res[key] = list;
-    });
+    if (data != null){
+      (data as Map).forEach((key, value){
+        List<int> list = List.from(value);
+        playlists[key] = list;
+      });
+    }
   }
+
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? localPlaylistsRaw = prefs.getString('playlists');
+  Map<String, List> localPlaylists = {};
+  if (localPlaylistsRaw != null){
+    localPlaylists = jsonDecode(localPlaylistsRaw);
+  } else {
+    localPlaylists = {};
+  }
+
+  final Set<String> playlistsSet = (playlists.entries.map((playlist) => playlist.key)).toSet();
+  final Set<String> localPlaylistSet = (localPlaylists.entries.map((playlist) => playlist.key)).toSet();
+
+  final playlistsIntersection = playlistsSet.intersection(localPlaylistSet);
+  final Map<String, List> res = {};
+  playlistsIntersection.forEach((playlist) {
+    playlistsSet.remove(playlist);
+    localPlaylistSet.remove(playlist);
+    final songs = playlists[playlist]!.toSet();
+    final localSongs = localPlaylists[playlist]!.toSet();
+    final songsIntersection = songs.union(localSongs);
+    res[playlist] = songsIntersection.toList();
+  });
+
+  playlistsSet.forEach((playlist) {
+    final songs = playlists[playlist];
+    if (songs != null){
+      res[playlist] = songs;
+    }
+  });
+
+  localPlaylistSet.forEach((playlist) {
+    final songs = playlists[playlist];
+    if (songs != null){
+      res[playlist] = songs;
+    }
+  });
 
   return res;
 }
@@ -32,6 +74,14 @@ void addInPlaylist(int songID, String login, String name) async {
 
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists/$name');
   await ref.set(playlist);
+
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? localPlaylistsRaw = prefs.getString('playlists');
+  if (localPlaylistsRaw != null){
+    final localPlaylists = jsonDecode(localPlaylistsRaw);
+    localPlaylists[name].add(songID);
+    prefs.setString('playlists', jsonEncode(localPlaylists));
+  }
 }
 
 List<int> addItem(List<int> list, int id) {
@@ -56,7 +106,7 @@ Future<void> removeFromCloudPlaylist(int id, String login) async {
 
 }
 
-Future<List<int>> removeFromPlaylist(List<int> list, int id, String login) async {
+Future<List<int>> removeFromPlaylist(List<int> list, int id, String login, String name) async {
   List<int> newList = [];
   list.forEach((item) {
     if (item != id){
@@ -66,6 +116,13 @@ Future<List<int>> removeFromPlaylist(List<int> list, int id, String login) async
 
   await removeFromCloudPlaylist(id, login);
 
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? localPlaylistsRaw = prefs.getString('playlists');
+  if (localPlaylistsRaw != null){
+    final localPlaylists = jsonDecode(localPlaylistsRaw);
+    localPlaylists[name].remove(id);
+    prefs.setString('playlists', jsonEncode(localPlaylists));
+  }
   return newList;
 }
 
@@ -73,14 +130,32 @@ Future<List<int>> removeFromPlaylist(List<int> list, int id, String login) async
 
 void createPlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists');
-  Map<String, List<int>> playlists = await getPlaylists(login);
+  Map<String, List> playlists = await getPlaylists(login);
   playlists[name] = [0];
   ref.set(playlists);
+
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? localPlaylistsRaw = prefs.getString('playlists');
+  if (localPlaylistsRaw != null){
+    final localPlaylists = jsonDecode(localPlaylistsRaw);
+    localPlaylists[name] = [0];
+    await prefs.setString('playlists', jsonEncode(localPlaylists));
+  } else {
+    await prefs.setString('playlists', '{"$name": [0]}');
+  }
 }
 
-void removePlaylist(String login, String name) {
+void removePlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists/$name');
   ref.remove();
+  
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? localPlaylistsRaw = prefs.getString('playlists');
+  if (localPlaylistsRaw != null){
+    final localPlaylists = jsonDecode(localPlaylistsRaw);
+    localPlaylists.remove(name);
+    prefs.setString('playlists', jsonEncode(localPlaylists));
+  }
 }
 
 Future<List<Map>> getItemsByIds(String login, List<int> list, BuildContext context) async {

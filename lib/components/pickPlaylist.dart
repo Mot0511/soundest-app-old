@@ -6,7 +6,7 @@ class PickPlaylist extends StatelessWidget{
   final String login;
   final Map item;
 
-  late Future<Map<String, List<int>>> playlists = getPlaylists(login);
+  late Future<Map<String, List>> playlists = getPlaylists(login);
 
   @override
   Widget build(BuildContext context){
@@ -16,7 +16,7 @@ class PickPlaylist extends StatelessWidget{
         content: Center(
           child: FutureBuilder(
             future: playlists,
-            builder: (BuildContext context, AsyncSnapshot<Map<String, List<int>>> snap) {
+            builder: (BuildContext context, AsyncSnapshot<Map<String, List>> snap) {
               if (snap.hasData) {
                 final data = snap.data;
                 if (data!.isNotEmpty) {

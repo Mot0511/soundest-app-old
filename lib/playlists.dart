@@ -14,7 +14,7 @@ class Playlists extends StatefulWidget{
 class _Playlists extends State<Playlists>{
   _Playlists({required this.login});
   final String login;
-  late Future<Map<String, List<int>?>> playlists = getPlaylists(login);
+  late Future<Map<String, List?>> playlists = getPlaylists(login);
 
   void updatePlaylists(action, name) async {
     final list = await playlists;
@@ -38,7 +38,7 @@ class _Playlists extends State<Playlists>{
       playlists = inFuture(list);
     });
   }
-  Future<Map<String, List<int>>> inFuture (data) async {
+  Future<Map<String, List>> inFuture (data) async {
     return data;
   }
 
