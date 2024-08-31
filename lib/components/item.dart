@@ -117,10 +117,7 @@ class _Item extends State<Item>{
                         value: 1,
                         child: const Text('Удалить с устройства'),
                         onTap: () {
-                          final title = item['title'];
-                          final author = item['author'];
-                          final file = File("/storage/emulated/0/Music/$title@$author.mp3");
-                          file.deleteSync();
+                          removeFromDevice(item['path']);
                           if (!isUploaded){
                             removeItem(item['id']);
                           }

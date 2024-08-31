@@ -10,6 +10,7 @@ import 'package:glob/glob.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
+import 'package:soundest/services/firebase.dart';
 import '../utils/checkInternet.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
@@ -53,16 +54,21 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildCont
       }
     });
 
-    final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$username/songs/');
-    final snap = await ref.get();
-    final items = (snap.value as List).toList();
     final Map<String, dynamic> newItem = {
       'id': item['id'],
       'title': item['title'],
       'author': item['author'], 
     };
-    items.add(newItem);
-    await ref.set(items);
+
+    final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$username/songs/');
+    final snap = await ref.get();
+    if (snap.exists){
+      final items = (snap.value as List).toList();
+      items.add(newItem);
+      await ref.set(items);
+    } else {
+      await ref.set([newItem]);
+    }
 
     final title = item['title'];
     final author = item['author'];
@@ -124,6 +130,8 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
         for (var i = 0; i < res.length; i++){
           for (var j = 0; j < res.length; j++){
             if (res[i]['title'] == res[j]['title'] && !res[i].containsKey('path') && res[i]['id'] != res[j]['id']){
+              final localItem = res[j];
+              final cloudItem = res[i];
               res[i]['path'] = res[j]['path'];
               res.removeAt(j);
             }
@@ -132,7 +140,7 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
 
       }
     });
-  } 
+  }
 
   Iterable isReverse = res.reversed;
   List<Map> items = (isReverse.toList() as List<Map>);
@@ -147,7 +155,7 @@ void uploadItems(String login, Future<List<Map>> items) async {
 }
 
 Future<void> removeFromCloud(Future<List<Map>> items, int id, String login) async {
-  List<Map> oldItems = await items;
+  final oldItems = (await getDatabase('users/$login/songs') as List);
 
   final storageRef = FirebaseStorage.instance.ref('$login/$id.mp3');
   await storageRef.delete();
@@ -164,6 +172,11 @@ Future<void> removeFromCloud(Future<List<Map>> items, int id, String login) asyn
 
   await removeFromCloudPlaylist(id, login);
 
+}
+
+void removeFromDevice(String path) {
+  final file = File(path);
+  file.deleteSync();
 }
 
 Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async { 
@@ -210,11 +223,14 @@ Future<String> getUrl(String path) async {
 Future<bool> getIsUploaded(int id, String login) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
   final snap = await ref.get();
-  final data = (snap.value as List);
-  for (var i = 0; i < data.length; i++){
-    if (data[i]['id'] == id){
-      return true;
+  if (snap.exists) {
+    final data = (snap.value as List);
+    for (var i = 0; i < data.length; i++){
+      if (data[i]['id'] == id){
+        return true;
+      }
     }
   }
+  
   return false;
 }
