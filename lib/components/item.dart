@@ -124,7 +124,8 @@ class _Item extends State<Item>{
                           isLocal = false;
                           item.remove('path');
                           setState(() => {});
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Трек удален с устройства')));
+                          final String title = item['title'];
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" удален с устройства')));
                         },
                       ),
                     if (isUploaded && type != 'playlist')

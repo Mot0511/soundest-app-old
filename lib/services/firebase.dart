@@ -4,9 +4,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 Future<Object?> getDatabase(String path) async {
   final DatabaseReference ref = FirebaseDatabase.instance.ref(path);
   final snap = await ref.get();
-  final data = snap.value;
-
-  return data;
+  if (snap.exists){
+    final data = snap.value;
+    return data;
+  } else {
+    return null;
+  }
+  
 }
 Future<void> setDatabase(String path, data) async {
   final DatabaseReference ref = FirebaseDatabase.instance.ref(path);

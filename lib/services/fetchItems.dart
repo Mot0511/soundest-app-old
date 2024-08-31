@@ -23,14 +23,14 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   final file = File('/storage/emulated/0/Music/$title@$author.mp3');
 
   final task = fileRef.writeToFile(file);
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка скачивается...')));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" скачивается...')));
   task.snapshotEvents.listen((snap) {
     switch (snap.state){
       case TaskState.success:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка скачана')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" скачан')));
         break;
       case TaskState.error:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Произошла ошибка при скачивании')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Произошла ошибка при скачивании трека "$title"')));
         break;
     }
   });
@@ -40,16 +40,18 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildCont
 
     final file = File(item['path']);
     final songID = item['id'];
+    final title = item['title'];
+    final author = item['author'];
 
     final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка загружается...')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" загружается...')));
     await fileRef.putFile(file).snapshotEvents.listen((snap) {
       switch (snap.state){
         case TaskState.success:
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Музыка загружена')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" загружен')));
           break;
         case TaskState.error:
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Произошла ошибка при загрузке')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Произошла ошибка при загрузке трека "$title"')));
           break;
       }
     });
@@ -60,18 +62,16 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildCont
       'author': item['author'], 
     };
 
-    final DatabaseReference ref = FirebaseDatabase.instance.ref('users/$username/songs/');
-    final snap = await ref.get();
-    if (snap.exists){
-      final items = (snap.value as List).toList();
+    final refPath = 'users/$username/songs/';
+    final data = await getDatabase(refPath);
+    if (data != null){
+      final items = (data as List).toList();
       items.add(newItem);
-      await ref.set(items);
+      await setDatabase(refPath, items);
     } else {
-      await ref.set([newItem]);
+      await setDatabase(refPath, [newItem]);
     }
 
-    final title = item['title'];
-    final author = item['author'];
     final newpath = path.join(path.dirname(file.path), '$title@$author.mp3');
     file.renameSync(newpath);
 }
@@ -192,19 +192,17 @@ Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async {
 }
 
 void editItem(int id, String login, String filename, String title, String author) async {
-  DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
-  final snap = await ref.get();
-  final items = (snap.value as List);
+  final items = (await getDatabase('/users/$login/songs/') as List);
 
-  for (var i = 0; i < items.length; i++){
-    if (items[i]['id'] == id){
-      items[i]['title'] = title;
-      items[i]['author'] = author;
+  if (items.isNotEmpty){
+    for (var i = 0; i < items.length; i++){
+      if (items[i]['id'] == id){
+        items[i]['title'] = title;
+        items[i]['author'] = author;
+      }
     }
+    await setDatabase('/users/$login/songs/', items);
   }
-
-  await ref.set(items);
-
 
   final file = File('/storage/emulated/0/Music/$filename');
   if (file.existsSync()) {
