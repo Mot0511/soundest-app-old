@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:soundest/settings.dart';
+import 'package:soundest/themes/dark.dart';
+import 'package:soundest/themes/light.dart';
 import 'package:soundest/utils/prefs.dart';
 import './signin.dart';
 import './home.dart';
@@ -29,13 +31,9 @@ class Soundest extends StatelessWidget {
   Widget build(BuildContext context){
     return MaterialApp(
       title: 'Soundest',
-      theme: ThemeData(
-        primaryColor: Color.fromARGB(255, 0, 0, 0),
-        scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-        )
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.light,
       home: const NavBar()
     );
   }
