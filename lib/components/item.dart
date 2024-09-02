@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soundest/components/pickPlaylist.dart';
 import 'package:soundest/editItem.dart';
+import 'package:soundest/utils/prefs.dart';
 import '../services/fetchItems.dart';
 import 'dart:io';
 import 'package:soundest/themes/dark.dart';
@@ -101,7 +102,8 @@ class _Item extends State<Item>{
                           await downloadItem(item, login, context);
                           final title = item['title'];
                           final author = item['author'];
-                          item['path'] = '/storage/emulated/0/Music/$title@$author.mp3';
+                          final musicPath = await getPrefs('musicPath');
+                          item['path'] = '$musicPath/$title@$author.mp3';
                           isLocal = true;
                           setState(() => {});
                         },

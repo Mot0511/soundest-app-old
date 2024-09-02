@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:soundest/utils/prefs.dart';
 
@@ -18,14 +19,21 @@ class _Settings extends State<Settings> {
 
   void getSettings() async {
     final musicPathPrefs = await getPrefs('musicPath');
-
-    setState(() async {
-      musicPath = musicPathPrefs != null ? musicPathPrefs : '/storage/emulated/0/Music';
-    });
+    if (musicPathPrefs != null){
+      setState(() {
+        musicPath = musicPathPrefs;
+      });
+    }
   }
 
-  void save() async {
-    setPrefs('musicPath', musicPath);
+  void saveMusicPath() async {
+    final String? dir = await FilePicker.platform.getDirectoryPath();
+    if (dir != null) {
+      setPrefs('musicPath', musicPath);
+      setState(() {
+        musicPath = dir;
+      });
+    }
   }
 
   @override
@@ -36,11 +44,35 @@ class _Settings extends State<Settings> {
       ),
       body: Column(
         children: [
-          
-          OutlinedButton(
-            onPressed: save,
-            child: const Text('Сохранить')
-          )
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: Column(
+                          children: [
+                            Align(alignment: Alignment.centerLeft, child: Text('Папка с музыкой', style: Theme.of(context).textTheme.labelMedium)),
+                            Text(musicPath)
+                          ],
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: () async {
+                          
+                        }, 
+                        child: const Icon(Icons.folder_open)
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
         ]
       )
     );

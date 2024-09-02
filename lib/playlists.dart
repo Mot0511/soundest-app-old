@@ -73,7 +73,7 @@ class _Playlists extends State<Playlists>{
           })
         ),
         Center(
-          child: OutlinedButton(
+          child: ElevatedButton(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EditPlaylist(data: '', action: 'creating', updatePlaylists: updatePlaylists))),
             child: const Text('Добавить плейлист'),
           )

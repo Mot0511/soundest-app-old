@@ -37,7 +37,7 @@ class _EditPlaylist extends State<EditPlaylist>{
                 ],
               )
             ),
-            OutlinedButton(
+            ElevatedButton(
               child: const Text('Сохранить'),
               onPressed: () {
                 switch (action){

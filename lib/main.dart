@@ -55,6 +55,14 @@ class _NavBar extends State<NavBar>{
   void initState() {
     super.initState();
     getLogin();
+    initMusicPath();
+  }
+
+  Future<void> initMusicPath() async {
+    final String? musicPath = await getPrefs('musicPath');
+    if (musicPath == null) {
+      await setPrefs('musicPath', '/storage/emulated/0/Music');
+    }
   }
 
   Future<void> getLogin() async {
@@ -107,19 +115,15 @@ class _NavBar extends State<NavBar>{
                 iconColor: Theme.of(context).primaryColor,
                 color: Theme.of(context).cardColor,
                 itemBuilder: (BuildContext context) => [
-                // PopupMenuItem(
-                //   onTap: () => Navigator.push(context, MaterialPageRoute(
-                //     builder: (context) => Settings())),
-                //   child: const Text('Настройки')
-                // ),
+                PopupMenuItem(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => Settings())),
+                  child: Text('Настройки', style: Theme.of(context).textTheme.labelMedium)
+                ),
                 PopupMenuItem(
                   onTap: logout,
                   child: Text('Выйти из аккаунта', style: Theme.of(context).textTheme.labelMedium)
                 ),
-                // PopupMenuItem(
-                //   onTap: () async => await removePrefs('playlists'),
-                //   child: const Text('Очистить prefs')
-                // )
               ]
               );
             } else {

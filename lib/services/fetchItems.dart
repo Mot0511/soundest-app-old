@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:soundest/services/firebase.dart';
+import 'package:soundest/utils/prefs.dart';
 import '../utils/checkInternet.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
@@ -20,7 +21,8 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   final author = item['author'];
   
   final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
-  final file = File('/storage/emulated/0/Music/$title@$author#$songID.mp3');
+  final musicPath = await getPrefs('musicPath');
+  final file = File('$musicPath/$title@$author#$songID.mp3');
 
   final task = fileRef.writeToFile(file);
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" скачивается...')));
@@ -102,9 +104,10 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
   final audioPermission = await Permission.audio.request().isGranted;
   final manageStoragePermission = await Permission.manageExternalStorage.request().isGranted;
   if (storagePermission || audioPermission && manageStoragePermission) {
-    final Directory dir = Directory('/storage/emulated/0/Music');
+    final musicPath = await getPrefs('musicPath');
+    final Directory dir = Directory('$musicPath');
     final List<FileSystemEntity> entities = dir.listSync(recursive: true, followLinks: true);
-    entities.forEach((entity) {
+    entities.forEach((entity) async {
       final filepath = entity.path;
       if (filepath.endsWith('.mp3')){
         final displayName = filepath.split('/').last;
@@ -131,8 +134,8 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
           });
           newpath = path.join(path.dirname(filepath), '$title#$songID.mp3');
         }
-
-        final file = File('/storage/emulated/0/Music/$displayName');
+        final musicPath = await getPrefs('musicPath');
+        final file = File('$musicPath/$displayName');
         file.renameSync(newpath);
         
         
@@ -210,8 +213,8 @@ void editItem(int id, String login, String filename, String title, String author
     }
     await setDatabase('/users/$login/songs/', items);
   }
-
-  final file = File('/storage/emulated/0/Music/$filename');
+  final musicPath = await getPrefs('musicPath');
+  final file = File('$musicPath/$filename');
   if (file.existsSync()) {
     final newpath = path.join(path.dirname(file.path), '$title@$author.mp3');
     file.renameSync(newpath);

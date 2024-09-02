@@ -34,7 +34,7 @@ class _EditItem extends State<EditItem>{
                 ],
               )
             ),
-            OutlinedButton(
+            ElevatedButton(
               child: const Text('Сохранить'),
               onPressed: () {
                 final oldTitle = data['title'];
