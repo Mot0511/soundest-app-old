@@ -4,6 +4,7 @@ import 'package:soundest/services/fetchItems.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:soundest/utils/checkInternet.dart';
+import 'package:soundest/utils/prefs.dart';
 
 Future<Map<String, List>> getPlaylists(String login) async {
   Map<String, List> playlists = {};
@@ -20,9 +21,8 @@ Future<Map<String, List>> getPlaylists(String login) async {
     }
   }
 
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final String? localPlaylistsRaw = prefs.getString('playlists');
-  Map<String, List> localPlaylists = {};
+  final String? localPlaylistsRaw = await getPrefs('playlists');
+  var localPlaylists = {};
   if (localPlaylistsRaw != null){
     localPlaylists = jsonDecode(localPlaylistsRaw);
   } else {
@@ -30,17 +30,21 @@ Future<Map<String, List>> getPlaylists(String login) async {
   }
 
   final Set<String> playlistsSet = (playlists.entries.map((playlist) => playlist.key)).toSet();
-  final Set<String> localPlaylistSet = (localPlaylists.entries.map((playlist) => playlist.key)).toSet();
+  final Set localPlaylistsSet = (localPlaylists.entries.map((playlist) => playlist.key)).toSet();
 
-  final playlistsIntersection = playlistsSet.intersection(localPlaylistSet);
+  final playlistsIntersection = playlistsSet.intersection(localPlaylistsSet);
   final Map<String, List> res = {};
   playlistsIntersection.forEach((playlist) {
     playlistsSet.remove(playlist);
-    localPlaylistSet.remove(playlist);
-    final songs = playlists[playlist]!.toSet();
-    final localSongs = localPlaylists[playlist]!.toSet();
-    final songsIntersection = songs.union(localSongs);
-    res[playlist] = songsIntersection.toList();
+    localPlaylistsSet.remove(playlist);
+    final songs = playlists[playlist];
+    final localSongs = localPlaylists[playlist];
+    Set songsIntersection = {};
+    if (songs != null && localSongs != null){
+      final songsIntersection = songs.toSet().union(localSongs.toSet());
+      res[playlist] = songsIntersection.toList();
+    }
+    
   });
 
   playlistsSet.forEach((playlist) {
@@ -50,7 +54,7 @@ Future<Map<String, List>> getPlaylists(String login) async {
     }
   });
 
-  localPlaylistSet.forEach((playlist) {
+  localPlaylistsSet.forEach((playlist) {
     final songs = playlists[playlist];
     if (songs != null){
       res[playlist] = songs;
@@ -106,7 +110,7 @@ Future<void> removeFromCloudPlaylist(int id, String login) async {
 
 }
 
-Future<List<int>> removeFromPlaylist(List<int> list, int id, String login, String name) async {
+Future<List<int>> removeFromPlaylist(List list, int id, String login, String name) async {
   List<int> newList = [];
   list.forEach((item) {
     if (item != id){
@@ -134,31 +138,32 @@ void createPlaylist(String login, String name) async {
   playlists[name] = [0];
   ref.set(playlists);
 
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final String? localPlaylistsRaw = prefs.getString('playlists');
+  final String? localPlaylistsRaw = await getPrefs('playlists');
   if (localPlaylistsRaw != null){
     final localPlaylists = jsonDecode(localPlaylistsRaw);
     localPlaylists[name] = [0];
-    await prefs.setString('playlists', jsonEncode(localPlaylists));
+    await setPrefs('playlists', jsonEncode(localPlaylists));
   } else {
-    await prefs.setString('playlists', '{"$name": [0]}');
+    await setPrefs('playlists', '{"$name": [0]}');
   }
+
 }
 
 void removePlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists/$name');
   ref.remove();
   
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final String? localPlaylistsRaw = prefs.getString('playlists');
+  final String? localPlaylistsRaw = await getPrefs('playlists');
   if (localPlaylistsRaw != null){
     final localPlaylists = jsonDecode(localPlaylistsRaw);
     localPlaylists.remove(name);
-    prefs.setString('playlists', jsonEncode(localPlaylists));
+    await setPrefs('playlists', jsonEncode(localPlaylists));
   }
+
+  final tmp = await getPrefs('playlists');
 }
 
-Future<List<Map>> getItemsByIds(String login, List<int> list, BuildContext context) async {
+Future<List<Map>> getItemsByIds(String login, List list, BuildContext context) async {
   final List<Map> items = await getItems(login, context);
   final List<Map> newItems = [];
 

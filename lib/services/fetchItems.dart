@@ -20,7 +20,7 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   final author = item['author'];
   
   final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
-  final file = File('/storage/emulated/0/Music/$title@$author.mp3');
+  final file = File('/storage/emulated/0/Music/$title@$author#$songID.mp3');
 
   final task = fileRef.writeToFile(file);
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" скачивается...')));
@@ -105,40 +105,46 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
     final Directory dir = Directory('/storage/emulated/0/Music');
     final List<FileSystemEntity> entities = dir.listSync(recursive: true, followLinks: true);
     entities.forEach((entity) {
-      final path = entity.path;
-      if (path.endsWith('.mp3')){
-        final songID = 1 + Random().nextInt(4294967296 - 1);
-        final displayName = path.split('/').last;
+      final filepath = entity.path;
+      if (filepath.endsWith('.mp3')){
+        final displayName = filepath.split('/').last;
+        final tmp = displayName.split('#')[1];
+        final songID = displayName.indexOf('#') != -1 ? int.parse(displayName.split('#')[1].split('.')[0]) : 1 + Random().nextInt(4294967296 - 1);
+        String newpath = '';
         if (displayName.indexOf('@') != -1){
           final title = displayName.split('@')[0];
-          final author = displayName.split('@')[1].split('.')[0];
+          final author = displayName.split('@')[1].split('.')[0].split('#')[0];
           res.add({
             'id': songID,
             'title': title,
             'author': author,
-            'path': path
+            'path': filepath
           });
+          newpath = path.join(path.dirname(filepath), '$title@$author#$songID.mp3');
         } else {
+          final title = displayName.split('.')[0];
           res.add({
             'id': songID,
-            'title': displayName.split('.')[0],
+            'title': title,
             'author': '',
-            'path': path
+            'path': filepath
           });
+          newpath = path.join(path.dirname(filepath), '$title#$songID.mp3');
         }
 
-        for (var i = 0; i < res.length; i++){
+        final file = File('/storage/emulated/0/Music/$displayName');
+        file.renameSync(newpath);
+        
+        
+      }
+      for (var i = 0; i < res.length; i++){
           for (var j = 0; j < res.length; j++){
-            if (res[i]['title'] == res[j]['title'] && !res[i].containsKey('path') && res[i]['id'] != res[j]['id']){
-              final localItem = res[j];
-              final cloudItem = res[i];
+            if (res[i]['title'] == res[j]['title'] && !res[i].containsKey('path') && i != j){
               res[i]['path'] = res[j]['path'];
               res.removeAt(j);
             }
           }
         }
-
-      }
     });
   }
 
@@ -192,9 +198,10 @@ Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async {
 }
 
 void editItem(int id, String login, String filename, String title, String author) async {
-  final items = (await getDatabase('/users/$login/songs/') as List);
+  final data = await getDatabase('/users/$login/songs/');
 
-  if (items.isNotEmpty){
+  if (data != null){
+    final items = data as List;
     for (var i = 0; i < items.length; i++){
       if (items[i]['id'] == id){
         items[i]['title'] = title;

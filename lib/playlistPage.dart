@@ -20,7 +20,7 @@ class PlaylistPage extends StatefulWidget{
 class _PlaylistPage extends State<PlaylistPage>{
   _PlaylistPage({required this.name, required this.list, required this.login});
   final name;
-  List<int> list;
+  List list;
   final String login;
 
   late Future<List<Map>> items = getItemsByIds(login, list, context);

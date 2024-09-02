@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:soundest/settings.dart';
+import 'package:soundest/utils/prefs.dart';
 import './signin.dart';
 import './home.dart';
 import './playlists.dart';
@@ -58,8 +60,7 @@ class _NavBar extends State<NavBar>{
   }
 
   Future<void> getLogin() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? login = prefs.getString('login');
+    final String? login = await getPrefs('login');
     if (login != null){
       isSigned = true;
       username = login;
@@ -70,8 +71,7 @@ class _NavBar extends State<NavBar>{
   }
 
   void logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('login');
+    await removePrefs('login');
     setState(() { 
       isSigned = false;
       username = '';
@@ -106,10 +106,19 @@ class _NavBar extends State<NavBar>{
           Builder(builder: (BuildContext context) {
             if (isSigned == true) {
               return PopupMenuButton(itemBuilder: (BuildContext context) => [
+                // PopupMenuItem(
+                //   onTap: () => Navigator.push(context, MaterialPageRoute(
+                //     builder: (context) => Settings())),
+                //   child: const Text('Настройки')
+                // ),
                 PopupMenuItem(
                   onTap: logout,
                   child: const Text('Выйти из аккаунта')
-                )
+                ),
+                // PopupMenuItem(
+                //   onTap: () async => await removePrefs('playlists'),
+                //   child: const Text('Очистить prefs')
+                // )
               ]
               );
             } else {

@@ -3,6 +3,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soundest/utils/prefs.dart';
 
 class Signin extends StatelessWidget {
   const Signin({super.key, required this.setIsSigned});
@@ -32,11 +33,9 @@ class Signin extends StatelessWidget {
         "email": email,
       });
     }
-
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     
     if (login != null){
-      await prefs.setString('login', login);
+      await setPrefs('login', login);
     }
     
     setIsSigned(true, login);
