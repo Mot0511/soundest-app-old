@@ -33,7 +33,7 @@ class Soundest extends StatelessWidget {
       title: 'Soundest',
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       home: const NavBar()
     );
   }
@@ -103,7 +103,10 @@ class _NavBar extends State<NavBar>{
         actions: [
           Builder(builder: (BuildContext context) {
             if (isSigned == true) {
-              return PopupMenuButton(itemBuilder: (BuildContext context) => [
+              return PopupMenuButton(
+                iconColor: Theme.of(context).primaryColor,
+                color: Theme.of(context).cardColor,
+                itemBuilder: (BuildContext context) => [
                 // PopupMenuItem(
                 //   onTap: () => Navigator.push(context, MaterialPageRoute(
                 //     builder: (context) => Settings())),
@@ -111,7 +114,7 @@ class _NavBar extends State<NavBar>{
                 // ),
                 PopupMenuItem(
                   onTap: logout,
-                  child: const Text('Выйти из аккаунта')
+                  child: Text('Выйти из аккаунта', style: Theme.of(context).textTheme.labelMedium)
                 ),
                 // PopupMenuItem(
                 //   onTap: () async => await removePrefs('playlists'),
@@ -144,7 +147,7 @@ class _NavBar extends State<NavBar>{
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
-                label: 'Моя музыка'
+                label: 'Моя музыка',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.content_copy),
@@ -152,7 +155,8 @@ class _NavBar extends State<NavBar>{
               ),
             ],
             currentIndex: page,
-            selectedItemColor: Theme.of(context).primaryColor,
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
             onTap: onTap
           );
         } else {

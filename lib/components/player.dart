@@ -23,8 +23,8 @@ class Player extends StatelessWidget {
               onChanged: (double value) async {
                 player.seek(Duration(seconds: value.toInt()));
               },
-              thumbColor: Colors.black,
-              activeColor: Colors.black,
+              thumbColor: Theme.of(context).colorScheme.primary,
+              activeColor: Theme.of(context).colorScheme.primary,
               inactiveColor: Colors.grey,
             );
           }
