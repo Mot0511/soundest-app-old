@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:soundest/UI/input.dart';
 
 class EditItem extends StatefulWidget{
   const EditItem({super.key, required this.data, this.editItem});
@@ -28,20 +29,8 @@ class _EditItem extends State<EditItem>{
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  TextFormField(
-                    controller: title,
-                    decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      labelText: 'Название'
-                    ),
-                  ),
-                  TextFormField(
-                    controller: author,
-                    decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      labelText: 'Автор'
-                    ),
-                  ),
+                  MyInput(text: 'Название', controller: title),
+                  MyInput(text: 'Автор', controller: author),
                 ],
               )
             ),

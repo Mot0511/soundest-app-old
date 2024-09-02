@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:soundest/UI/input.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
 class EditPlaylist extends StatefulWidget{
@@ -20,7 +21,6 @@ class _EditPlaylist extends State<EditPlaylist>{
 
   late final name = TextEditingController(text: data);
  
-
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -33,13 +33,7 @@ class _EditPlaylist extends State<EditPlaylist>{
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  TextFormField(
-                    controller: name,
-                    decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      labelText: 'Название'
-                    ),
-                  ),
+                  MyInput(text: 'Название', controller: name),
                 ],
               )
             ),

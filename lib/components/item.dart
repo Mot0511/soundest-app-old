@@ -3,6 +3,7 @@ import 'package:soundest/components/pickPlaylist.dart';
 import 'package:soundest/editItem.dart';
 import '../services/fetchItems.dart';
 import 'dart:io';
+import 'package:soundest/themes/dark.dart';
 
 
 class Item extends StatefulWidget{
@@ -88,12 +89,14 @@ class _Item extends State<Item>{
                 ),
               ),
               PopupMenuButton(
-                color: Theme.of(context).scaffoldBackgroundColor,
+                iconColor: Theme.of(context).primaryColor,
+                color: Theme.of(context).cardColor,
                 itemBuilder: (BuildContext context) => [
                     if (!isLocal && isUploaded && type != 'playlist')
                       PopupMenuItem(
+                        textStyle: Theme.of(context).textTheme.bodyMedium,
                         value: 1,
-                        child: const Text('Скачать на устройство'),
+                        child: Text('Скачать на устройство', style: Theme.of(context).textTheme.labelMedium),
                         onTap: () async {
                           await downloadItem(item, login, context);
                           final title = item['title'];
@@ -106,7 +109,7 @@ class _Item extends State<Item>{
                     if (isLocal && !isUploaded && type != 'playlist')
                       PopupMenuItem(
                         value: 1,
-                        child: const Text('Загрузить в облако'),
+                        child: Text('Загрузить в облако', style: Theme.of(context).textTheme.labelMedium),
                         onTap: () {
                           uploadItem(item, context);
                           setState(() => isUploaded = true);
@@ -115,7 +118,7 @@ class _Item extends State<Item>{
                     if (isLocal && type != 'playlist')
                       PopupMenuItem(
                         value: 1,
-                        child: const Text('Удалить с устройства'),
+                        child: Text('Удалить с устройства', style: Theme.of(context).textTheme.labelMedium),
                         onTap: () {
                           removeFromDevice(item['path']);
                           if (!isUploaded){
@@ -131,7 +134,7 @@ class _Item extends State<Item>{
                     if (isUploaded && type != 'playlist')
                       PopupMenuItem(
                         value: 1,
-                        child: const Text('Удалить из облака'),
+                        child: Text('Удалить из облака', style: Theme.of(context).textTheme.labelMedium),
                         onTap: () {
                           removeFromCloud_(item['id'], context);
                           if (!isLocal){
@@ -142,7 +145,7 @@ class _Item extends State<Item>{
                       ),
                     PopupMenuItem(
                       value: 1,
-                      child: const Text('Добавить в плейлист'),
+                      child: Text('Добавить в плейлист', style: Theme.of(context).textTheme.labelMedium),
                       onTap: () => showDialog(
                         context: context,
                         builder: (BuildContext context) => PickPlaylist(login: login, item: item)
@@ -151,12 +154,12 @@ class _Item extends State<Item>{
                     if (type == 'playlist')
                       PopupMenuItem(
                         value: 1,
-                        child: const Text('Удалить из плейлиста'),
+                        child: Text('Удалить из плейлиста', style: Theme.of(context).textTheme.labelMedium),
                         onTap: () => removeFromPlaylist_(item['id']),
                       ),
                     PopupMenuItem(
                       value: 2,
-                      child: const Text('Изменить название или автора'),
+                      child: Text('Изменить название или автора', style: Theme.of(context).textTheme.labelMedium),
                         onTap: () => Navigator.push(context, MaterialPageRoute(
                           builder: (context) => EditItem(data: item, editItem: editItem_))),
                     ),
