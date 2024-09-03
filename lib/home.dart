@@ -1,5 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:soundest/utils/showSnackBar.dart';
 import './services/fetchItems.dart';
 import 'dart:math';
 import 'package:assets_audio_player/assets_audio_player.dart';
@@ -111,7 +112,7 @@ class _Home extends State<Home>{
 
   void removeFromCloud_(int id, BuildContext context) {
     removeFromCloud(items, id, login);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Трек удален из облака')));
+    showSnackBar('Трек удален из облака', context);
   }
 
   void removeItem(int id) async {

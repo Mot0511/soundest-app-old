@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soundest/components/pickPlaylist.dart';
 import 'package:soundest/editItem.dart';
 import 'package:soundest/utils/prefs.dart';
+import 'package:soundest/utils/showSnackBar.dart';
 import '../services/fetchItems.dart';
 import 'dart:io';
 import 'package:soundest/themes/dark.dart';
@@ -130,7 +131,7 @@ class _Item extends State<Item>{
                           item.remove('path');
                           setState(() => {});
                           final String title = item['title'];
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" удален с устройства')));
+                          showSnackBar('Трек "$title" удален с устройства', context);
                         },
                       ),
                     if (isUploaded && type != 'playlist')

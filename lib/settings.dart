@@ -19,23 +19,12 @@ class _Settings extends State<Settings> {
 
   void getSettings() async {
     final musicPathPrefs = await getPrefs('musicPath');
-    if (musicPathPrefs != null){
-      setState(() {
-        musicPath = musicPathPrefs;
-      });
-    }
-  }
 
-  void saveMusicPath() async {
-    final String? dir = await FilePicker.platform.getDirectoryPath();
-    if (dir != null) {
-      setPrefs('musicPath', musicPath);
-      setState(() {
-        musicPath = dir;
-      });
-    }
+    setState(() {
+      musicPath = musicPathPrefs != null ? musicPathPrefs : '/storage/emulated/0/Music';
+    });
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +52,13 @@ class _Settings extends State<Settings> {
                       ),
                       OutlinedButton(
                         onPressed: () async {
-                          
+                          final String? dir = await FilePicker.platform.getDirectoryPath();
+                          if (dir != null) {
+                            setState(() {
+                              musicPath = dir;
+                            });
+                            setPrefs('musicPath', musicPath);
+                          }
                         }, 
                         child: const Icon(Icons.folder_open)
                       )

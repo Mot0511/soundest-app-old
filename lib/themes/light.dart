@@ -31,10 +31,11 @@ final lightTheme = ThemeData(
     )
   ),
   textTheme: TextTheme(
-    bodyMedium: basicTextStyle.copyWith(fontSize: 18),
+    bodyMedium: basicTextStyle.copyWith(fontSize: 15),
     bodyLarge: basicTextStyle.copyWith(fontSize: 20),
     labelMedium: basicTextStyle.copyWith(fontSize: 14),
   ),
   cardColor: const Color.fromARGB(255, 228, 228, 228),
-  elevatedButtonTheme: ElevatedButtonThemeData(style: elevatedButtonStyle)
+  elevatedButtonTheme: ElevatedButtonThemeData(style: elevatedButtonStyle),
+  snackBarTheme: const SnackBarThemeData(backgroundColor: Color.fromARGB(255, 228, 228, 228))
 );

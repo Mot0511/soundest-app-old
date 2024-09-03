@@ -12,7 +12,8 @@ class PickPlaylist extends StatelessWidget{
   Widget build(BuildContext context){
     return (
       AlertDialog(
-        title: const Text('Выберите плейлист'),
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text('Выберите плейлист', style: Theme.of(context).textTheme.bodyLarge),
         content: Center(
           child: FutureBuilder(
             future: playlists,

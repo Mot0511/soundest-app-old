@@ -12,6 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:soundest/services/firebase.dart';
 import 'package:soundest/utils/prefs.dart';
+import 'package:soundest/utils/showSnackBar.dart';
 import '../utils/checkInternet.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
@@ -25,14 +26,14 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   final file = File('$musicPath/$title@$author#$songID.mp3');
 
   final task = fileRef.writeToFile(file);
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" скачивается...')));
+  showSnackBar('Трек "$title" скачивается...', context);
   task.snapshotEvents.listen((snap) {
     switch (snap.state){
       case TaskState.success:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" скачан')));
+        showSnackBar('Трек "$title" скачан', context);
         break;
       case TaskState.error:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Произошла ошибка при скачивании трека "$title"')));
+        showSnackBar('Произошла ошибка при скачивании трека "$title"', context);
         break;
     }
   });
@@ -46,14 +47,14 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildCont
     final author = item['author'];
 
     final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" загружается...')));
+    showSnackBar('Трек "$title" загружается...', context);
     await fileRef.putFile(file).snapshotEvents.listen((snap) {
       switch (snap.state){
         case TaskState.success:
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Трек "$title" загружен')));
+          showSnackBar('Трек "$title" загружен', context);
           break;
         case TaskState.error:
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Произошла ошибка при загрузке трека "$title"')));
+          showSnackBar('Произошла ошибка при загрузке трека "$title"', context);
           break;
       }
     });
@@ -97,7 +98,7 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
       });
     }
   } else {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Отсутствует интернет соеднение')));
+    showSnackBar('Отсутствует интернет соеднение', context);
   }
   
   final storagePermission = await Permission.storage.request().isGranted;
