@@ -5,10 +5,12 @@
 
 Soundest можно сравнить с Google Photo или с Google Drive, только Google Photo для фотографий, а Soundest для музыки.
 
-Soundest есть как в виде web версии для пк или ноутбука (https://soundest.vercel.app), так и в виде этого приложения, которое можно скачать в Rustore по ссылке ниже.
+Soundest есть как в виде web версии для пк или ноутбука, так и в виде этого приложения, которое можно скачать в Rustore (все ссылки ниже).
 ## Используемые технологии
 - Dart
 - Flutter
 - Firebase
   
-Скачать Soundest на андроид - https://www.rustore.ru/catalog/app/com.ms.sndst
+**Ссылка на сайт - https://soundest.vercel.app/**
+
+**Скачать Soundest на андроид - https://www.rustore.ru/catalog/app/com.ms.sndst**
