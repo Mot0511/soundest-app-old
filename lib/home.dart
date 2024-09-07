@@ -8,6 +8,7 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'components/player.dart';
 import 'components/item.dart';
 
+// Главная страница с треками
 class Home extends StatefulWidget{
   const Home({super.key, required this.login});
   final login;

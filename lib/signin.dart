@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soundest/utils/prefs.dart';
 
+// Страница с кнопкой для входа в аккаунт
 class Signin extends StatelessWidget {
   const Signin({super.key, required this.setIsSigned});
   final setIsSigned;
@@ -19,7 +20,6 @@ class Signin extends StatelessWidget {
       idToken: googleAuth?.idToken,
     );
 
-    // Once signed in, return the UserCredential
     final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
     final email = userCredential.user?.email;
     final login = email?.split('@')[0];

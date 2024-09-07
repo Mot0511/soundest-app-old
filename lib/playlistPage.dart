@@ -8,6 +8,7 @@ import 'package:soundest/services/fetchPlaylists.dart';
 import 'dart:math';
 import 'package:soundest/components/player.dart';
 
+// Страница самого плейлиста
 class PlaylistPage extends StatefulWidget{
   const PlaylistPage({super.key, required this.name, required this.list, required this.login});
   final name;

@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:soundest/utils/prefs.dart';
 
+// Страница с настройками
 class Settings extends StatefulWidget{
   const Settings({super.key});
 

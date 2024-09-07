@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Кастомное поле ввода
 class MyInput extends StatelessWidget{
   const MyInput({super.key, required this.text, required this.controller});
   final String text;

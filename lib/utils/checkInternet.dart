@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 
+// Проверка подключения к интернету
 Future<bool> internet() async {
     try {
       final result = await InternetAddress.lookup('google.com');

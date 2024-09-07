@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
+// СТИЛИ ТЕМНОЙ ТЕМЫ
+
+// Глобальный стиль для текста
 TextStyle basicTextStyle = const TextStyle(color: Colors.white);
 
+// Стиль для elevated кнопки
 ButtonStyle elevatedButtonStyle = const ButtonStyle(
   backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 255, 255, 255)),
   foregroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 0, 0, 0)),
   overlayColor: WidgetStatePropertyAll(Color.fromARGB(255, 215, 215, 215)),
 );
 
-
+// Цветовая схема
 ColorScheme colorScheme = const ColorScheme(
   brightness: Brightness.dark, 
   primary: Colors.white, 
@@ -22,6 +26,7 @@ ColorScheme colorScheme = const ColorScheme(
   outline: Colors.white,
 );
 
+// Сама тема
 final darkTheme = ThemeData(
   colorScheme: colorScheme,
   scaffoldBackgroundColor: Colors.black,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soundest/UI/input.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
-// Страница 
+// Страница изменения данных плейлиста
 class EditPlaylist extends StatefulWidget{
   const EditPlaylist({super.key, required this.data, required this.action, required this.updatePlaylists});
   final updatePlaylists;
