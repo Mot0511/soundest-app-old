@@ -51,7 +51,6 @@ dependencies:
   permission_handler: ^11.3.1
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
@@ -74,19 +73,3 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/images/icon.png"
-  min_sdk_android: 21
-  web:
-    generate: true
-    image_path: "assets/images/icon.png"
-  windows:
-    generate: true
-    image_path: "assets/images/icon.png"
-    icon_size: 48
-  macos:
-    generate: true
-    image_path: "assets/images/icon.png"

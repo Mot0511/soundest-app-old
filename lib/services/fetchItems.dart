@@ -16,6 +16,7 @@ import 'package:soundest/utils/showSnackBar.dart';
 import '../utils/checkInternet.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
+// Скачавание трека на устройство
 Future<void> downloadItem(Map item, String username, BuildContext context) async {
   final songID = item['id'];
   final title = item['title'];
@@ -39,8 +40,8 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   });
 }
 
+// Загрузка трека в облако
 void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildContext context) async {
-
     final file = File(item['path']);
     final songID = item['id'];
     final title = item['title'];
@@ -79,11 +80,12 @@ void uploadSong(Map item, Future<List<Map>> oldItems, String username, BuildCont
     file.renameSync(newpath);
 }
 
+// Получения списка треков
 Future<List<Map>> getItems(String login, BuildContext context) async {
-
   List<Map<String, dynamic>> res = [];
 
   if (await internet()){
+    // Получение треков из облака
     DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
     final snap = await ref.get();
     final data = snap.value;
@@ -101,6 +103,7 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
     showSnackBar('Отсутствует интернет соеднение', context);
   }
   
+  // Получение треков из локального хранилища
   final storagePermission = await Permission.storage.request().isGranted;
   final audioPermission = await Permission.audio.request().isGranted;
   final manageStoragePermission = await Permission.manageExternalStorage.request().isGranted;
@@ -112,7 +115,6 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
       final filepath = entity.path;
       if (filepath.endsWith('.mp3')){
         final displayName = filepath.split('/').last;
-        final tmp = displayName.split('#')[1];
         final songID = displayName.indexOf('#') != -1 ? int.parse(displayName.split('#')[1].split('.')[0]) : 1 + Random().nextInt(4294967296 - 1);
         String newpath = '';
         if (displayName.indexOf('@') != -1){
@@ -141,17 +143,19 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
         
         
       }
-      for (var i = 0; i < res.length; i++){
-          for (var j = 0; j < res.length; j++){
-            if (res[i]['title'] == res[j]['title'] && !res[i].containsKey('path') && i != j){
-              res[i]['path'] = res[j]['path'];
-              res.removeAt(j);
-            }
-          }
-        }
+      
     });
   }
-
+  // Если один и тот же трек есть и в облаке, и на устройстве, появятся повторяющиеся треки
+  // Цикл ниже убирает повторяющися треки из списка
+  for (var i = 0; i < res.length; i++){
+    for (var j = 0; j < res.length; j++){
+      if (res[i]['title'] == res[j]['title'] && i != j){
+        res[i]['path'] = res[j]['path'];
+        res.removeAt(j);
+      }
+    }
+  }
   Iterable isReverse = res.reversed;
   List<Map> items = (isReverse.toList() as List<Map>);
 
@@ -164,6 +168,7 @@ void uploadItems(String login, Future<List<Map>> items) async {
   ref.set(data);
 }
 
+// Удаление трека из облака
 Future<void> removeFromCloud(Future<List<Map>> items, int id, String login) async {
   final oldItems = (await getDatabase('users/$login/songs') as List);
 
@@ -184,11 +189,13 @@ Future<void> removeFromCloud(Future<List<Map>> items, int id, String login) asyn
 
 }
 
+// Удаление трека с устройства
 void removeFromDevice(String path) {
   final file = File(path);
   file.deleteSync();
 }
 
+// Удаление трека из передаваемого списка, возвращается измененный список треков
 Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async { 
   final oldItems = await items;
   List<Map> newItems = [];
@@ -201,6 +208,7 @@ Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async {
   return newItems;
 }
 
+// Изменение трека в облаке и на устройстве
 void editItem(int id, String login, String filename, String title, String author) async {
   final data = await getDatabase('/users/$login/songs/');
 
@@ -223,12 +231,14 @@ void editItem(int id, String login, String filename, String title, String author
 
 }
 
+// Поулчение url трека из облака
 Future<String> getUrl(String path) async {
   final ref = FirebaseStorage.instance.ref(path);
   final url = await ref.getDownloadURL();
   return url;
 }
 
+// Проверка на присутствие трека в облаке
 Future<bool> getIsUploaded(int id, String login) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/songs/');
   final snap = await ref.get();

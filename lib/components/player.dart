@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
 
-
+// Плеер, отображаемый внизу экрана
 class Player extends StatelessWidget {
   const Player({super.key, required this.player, required this.duration, required this.item, required this.leaf, required this.play, required this.isPlay});
   final AssetsAudioPlayer player;

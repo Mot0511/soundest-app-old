@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
+// Окно выбора плейлиста
 class PickPlaylist extends StatelessWidget{
   PickPlaylist({super.key, required this.login, required this.item});
   final String login;
@@ -55,6 +56,8 @@ class PickPlaylist extends StatelessWidget{
     );
   }
 }
+
+// Элемент трека в окне выбора плейлиста
 class PlaylistItem extends StatelessWidget {
   const PlaylistItem(
       {super.key,

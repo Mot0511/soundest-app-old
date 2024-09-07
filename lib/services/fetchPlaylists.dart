@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:soundest/utils/checkInternet.dart';
 import 'package:soundest/utils/prefs.dart';
 
+// Получение списка плейлистов
 Future<Map<String, List>> getPlaylists(String login) async {
   Map<String, List> playlists = {};
   if (await internet()){
@@ -24,6 +25,7 @@ Future<Map<String, List>> getPlaylists(String login) async {
   return playlists;
 }
 
+// Получение списка id треков в одном плейлисте
 Future<List> getPlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists/$name');
   final snap = await ref.get();
@@ -32,6 +34,7 @@ Future<List> getPlaylist(String login, String name) async {
   return data;
 }
 
+// Добавление трека в плейлист
 void addInPlaylist(int songID, String login, String name) async {
   final playlist = await getPlaylist(login, name);
   playlist.add(songID);
@@ -41,11 +44,13 @@ void addInPlaylist(int songID, String login, String name) async {
 
 }
 
+// Добавление трека в передаваемый список, возвращается измененный список плейлистов
 List<int> addItem(List<int> list, int id) {
   list.add(id);
   return list;
 }
 
+// Удаление плейлиста из облака
 Future<void> removeFromCloudPlaylist(int id, String login) async {
   final DatabaseReference playlistsRef = FirebaseDatabase.instance.ref('users/$login/playlists/');
   final snap = await playlistsRef.get();
@@ -63,6 +68,7 @@ Future<void> removeFromCloudPlaylist(int id, String login) async {
 
 }
 
+// Удаление трека из плейлиста
 Future<List<int>> removeFromPlaylist(List list, int id, String login, String name) async {
   List<int> newList = [];
   list.forEach((item) {
@@ -76,8 +82,7 @@ Future<List<int>> removeFromPlaylist(List list, int id, String login, String nam
   return newList;
 }
 
-
-
+// Создание плейлиста
 void createPlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists');
   Map<String, List> playlists = await getPlaylists(login);
@@ -86,11 +91,13 @@ void createPlaylist(String login, String name) async {
 
 }
 
+// Удаление плейлиста из облака
 void removePlaylist(String login, String name) async {
   DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login/playlists/$name');
   ref.remove();
 }
 
+// Получение треков из плейлиста
 Future<List<Map>> getItemsByIds(String login, List list, BuildContext context) async {
   final List<Map> items = await getItems(login, context);
   final List<Map> newItems = [];

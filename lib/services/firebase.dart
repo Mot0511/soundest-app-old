@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+// Получение данных из базы данных Firebase
 Future<Object?> getDatabase(String path) async {
   final DatabaseReference ref = FirebaseDatabase.instance.ref(path);
   final snap = await ref.get();
@@ -12,6 +13,8 @@ Future<Object?> getDatabase(String path) async {
   }
   
 }
+
+// Занесение данных в базу данных Firebase
 Future<void> setDatabase(String path, data) async {
   final DatabaseReference ref = FirebaseDatabase.instance.ref(path);
   await ref.set(data);

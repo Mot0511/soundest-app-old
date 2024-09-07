@@ -3,6 +3,7 @@ import 'package:soundest/editPlaylist.dart';
 import 'package:soundest/playlistPage.dart';
 import 'package:soundest/services/fetchPlaylists.dart';
 
+// Элемент одного плейлиста
 class PlaylistItem extends StatelessWidget{
   const PlaylistItem({super.key, required this.name, required this.list, this.updatePlaylists, required this.login});
   final updatePlaylists;

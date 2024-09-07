@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soundest/UI/input.dart';
 
+// Страница изменения данных трека
 class EditItem extends StatefulWidget{
   const EditItem({super.key, required this.data, this.editItem});
   final data;

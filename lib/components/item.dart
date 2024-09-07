@@ -7,7 +7,7 @@ import '../services/fetchItems.dart';
 import 'dart:io';
 import 'package:soundest/themes/dark.dart';
 
-
+// Элемент одного трека
 class Item extends StatefulWidget{
   const Item({super.key, required this.login, required this.item, required this.setSong, required this.type, this.uploadItem, this.removeFromCloud_, this.removeItem, this.removeFromPlaylist_});
   final login;
@@ -44,10 +44,13 @@ class _Item extends State<Item>{
   }
 
   void checkStates() async {
+    /// Инициализация состояний трека
     super.initState();
+    // Проверка на присутствие трека на устройстве
     if (item.containsKey('path')){
       isLocal = true;
     }
+    // Проверка на присутствие трека в облаке
     if (await getIsUploaded(item['id'], login)){
       isUploaded = true;
     }
@@ -55,6 +58,7 @@ class _Item extends State<Item>{
   }
 
   void editItem_(int id, String filename, String title, String author) {
+    /// Изменения данных трека в состоянии
     setState(() {
       item['title'] = title;
       item['author'] = author;
