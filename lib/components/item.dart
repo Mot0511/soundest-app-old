@@ -4,6 +4,7 @@ import 'package:soundest/editItem.dart';
 import 'package:soundest/utils/prefs.dart';
 import 'package:soundest/utils/showSnackBar.dart';
 import '../services/fetchItems.dart';
+import 'package:path/path.dart' as path;
 import 'dart:io';
 import 'package:soundest/themes/dark.dart';
 
@@ -57,13 +58,15 @@ class _Item extends State<Item>{
     setState(() {});
   }
 
-  void editItem_(int id, String filename, String title, String author) {
+  void editItem_(String title, String author) async {
     /// Изменения данных трека в состоянии
+    final id = item['id'];
+    await editItem(item, login, title, author);
     setState(() {
       item['title'] = title;
       item['author'] = author;
+      item['path'] = path.join(path.dirname(item['path']), '$title@$author№$id.mp3');
     });
-    editItem(id, login, filename, title, author);
   }
 
   @override
@@ -105,10 +108,11 @@ class _Item extends State<Item>{
                         child: Text('Скачать на устройство', style: Theme.of(context).textTheme.labelMedium),
                         onTap: () async {
                           await downloadItem(item, login, context);
+                          final id = item['id'];
                           final title = item['title'];
                           final author = item['author'];
                           final musicPath = await getPrefs('musicPath');
-                          item['path'] = '$musicPath/$title@$author.mp3';
+                          item['path'] = '$musicPath/$title@$author№$id.mp3';
                           isLocal = true;
                           setState(() => {});
                         },
@@ -167,8 +171,13 @@ class _Item extends State<Item>{
                     PopupMenuItem(
                       value: 2,
                       child: Text('Изменить название или автора', style: Theme.of(context).textTheme.labelMedium),
-                        onTap: () => Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => EditItem(data: item, editItem: editItem_))),
+                        onTap: () => {
+                          Navigator.push(
+                            context, MaterialPageRoute(
+                              builder: (context) => EditItem(data: item, editItem: editItem_)
+                            )
+                          ),
+                        }
                     ),
                 ]),
             ]

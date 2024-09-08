@@ -24,7 +24,7 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   
   final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
   final musicPath = await getPrefs('musicPath');
-  final file = File('$musicPath/$title@$author#$songID.mp3');
+  final file = File('$musicPath/$title@$author№$songID.mp3');
 
   final task = fileRef.writeToFile(file);
   showSnackBar('Трек "$title" скачивается...', context);
@@ -109,42 +109,43 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
   final manageStoragePermission = await Permission.manageExternalStorage.request().isGranted;
   if (storagePermission || audioPermission && manageStoragePermission) {
     final musicPath = await getPrefs('musicPath');
-    final Directory dir = Directory('$musicPath');
-    final List<FileSystemEntity> entities = dir.listSync(recursive: true, followLinks: true);
-    entities.forEach((entity) async {
-      final filepath = entity.path;
-      if (filepath.endsWith('.mp3')){
-        final displayName = filepath.split('/').last;
-        final songID = displayName.indexOf('#') != -1 ? int.parse(displayName.split('#')[1].split('.')[0]) : 1 + Random().nextInt(4294967296 - 1);
-        String newpath = '';
-        if (displayName.indexOf('@') != -1){
-          final title = displayName.split('@')[0];
-          final author = displayName.split('@')[1].split('.')[0].split('#')[0];
-          res.add({
-            'id': songID,
-            'title': title,
-            'author': author,
-            'path': filepath
-          });
-          newpath = path.join(path.dirname(filepath), '$title@$author#$songID.mp3');
-        } else {
-          final title = displayName.split('.')[0];
-          res.add({
-            'id': songID,
-            'title': title,
-            'author': '',
-            'path': filepath
-          });
-          newpath = path.join(path.dirname(filepath), '$title#$songID.mp3');
+    if (musicPath != null) {
+      final Directory dir = Directory(musicPath);
+      final List<FileSystemEntity> entities = dir.listSync(recursive: true, followLinks: true);
+      entities.forEach((entity) async {
+        final filepath = entity.path;
+        if (filepath.endsWith('.mp3')){
+          final displayName = filepath.split('/').last;
+          final songID = displayName.indexOf('№') != -1 ? int.parse(displayName.split('№')[1].split('.')[0]) : 1 + Random().nextInt(4294967296 - 1);
+          String newpath = '';
+          if (displayName.indexOf('@') != -1){
+            final title = displayName.split('@')[0];
+            final author = displayName.split('@')[1].split('.')[0].split('№')[0];
+            newpath = path.join(path.dirname(filepath), '$title@$author№$songID.mp3');
+            res.add({
+              'id': songID,
+              'title': title,
+              'author': author,
+              'path': newpath
+            });
+          } else {
+            final title = displayName.split('.')[0];
+            newpath = path.join(path.dirname(filepath), '$title№$songID.mp3');
+            res.add({
+              'id': songID,
+              'title': title,
+              'author': '',
+              'path': newpath
+            });
+          }
+          final file = File(filepath);
+          file.renameSync(newpath);
+          
+          
         }
-        final musicPath = await getPrefs('musicPath');
-        final file = File('$musicPath/$displayName');
-        file.renameSync(newpath);
         
-        
-      }
-      
-    });
+      });
+    }
   }
   // Если один и тот же трек есть и в облаке, и на устройстве, появятся повторяющиеся треки
   // Цикл ниже убирает повторяющися треки из списка
@@ -209,26 +210,29 @@ Future<List<Map>> removeItemFromList(Future<List<Map>> items, int id) async {
 }
 
 // Изменение трека в облаке и на устройстве
-void editItem(int id, String login, String filename, String title, String author) async {
+Future<void> editItem(Map item, String login, String title, String author) async {
   final data = await getDatabase('/users/$login/songs/');
 
   if (data != null){
     final items = data as List;
     for (var i = 0; i < items.length; i++){
-      if (items[i]['id'] == id){
+      if (items[i]['id'] == item['id']){
         items[i]['title'] = title;
         items[i]['author'] = author;
       }
     }
     await setDatabase('/users/$login/songs/', items);
   }
-  final musicPath = await getPrefs('musicPath');
-  final file = File('$musicPath/$filename');
-  if (file.existsSync()) {
-    final newpath = path.join(path.dirname(file.path), '$title@$author.mp3');
-    file.renameSync(newpath);
-  }
 
+  if (item.containsKey('path')){
+    final itemPath = item['path'];
+    final id = item['id'];
+    final file = File(itemPath);
+    if (file.existsSync()) {
+      final newpath = path.join(path.dirname(file.path), '$title@$author№$id.mp3');
+      file.renameSync(newpath);
+    }
+  }
 }
 
 // Поулчение url трека из облака

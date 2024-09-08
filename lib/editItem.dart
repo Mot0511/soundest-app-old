@@ -40,7 +40,7 @@ class _EditItem extends State<EditItem>{
               onPressed: () {
                 final oldTitle = data['title'];
                 final oldAuthor = data['author'];
-                editItem(data['id'], '$oldTitle@$oldAuthor.mp3', title.text, author.text);
+                editItem(title.text, author.text);
                 Navigator.pop(context);
               },
             )
