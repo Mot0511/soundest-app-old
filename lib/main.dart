@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:soundest/components/player.dart';
 import 'package:soundest/settings.dart';
 import 'package:soundest/themes/dark.dart';
 import 'package:soundest/themes/light.dart';
@@ -30,12 +32,17 @@ class Soundest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context){
-    return MaterialApp(
-      title: 'Soundest',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
-      home: const NavBar()
+    return MultiProvider(
+      providers: [
+        Provider(create: (context) => PlayerManager(context))
+      ],
+      child: MaterialApp(
+        title: 'Soundest',
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.system,
+        home: const NavBar()
+      ),
     );
   }
 }
@@ -137,7 +144,30 @@ class _NavBar extends State<NavBar>{
       body: Container(
         padding: const EdgeInsets.all(0),
         child: (isSigned == true 
-          ? Pages.elementAt(page) 
+          ? Column(
+            children: [
+              Pages.elementAt(page),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: FutureBuilder(
+                  future: Provider.of<PlayerManager>(context).items,
+                  builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
+                    Widget children = const SizedBox.shrink();
+                    if (snapshot.hasData){
+                      final data = snapshot.data;
+                      if (data!.isNotEmpty){
+                        children = SizedBox(
+                          height: 101,
+                          child: Player()
+                        );
+                      }
+                    }
+                    return children;
+                  }
+                )
+              )
+            ],
+          )
           : isSigned == false 
             ? Signin(setIsSigned: setIsSigned) 
             : isSigned == null 
@@ -145,7 +175,7 @@ class _NavBar extends State<NavBar>{
                   alignment: Alignment.center,
                   child: CircularProgressIndicator()
                 ) 
-              : const SizedBox.shrink()), 
+              : const SizedBox.shrink()),
       ),
       bottomNavigationBar: Builder(builder: (context) {
         if (isSigned == true) {

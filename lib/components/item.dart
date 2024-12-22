@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:soundest/components/pickPlaylist.dart';
+import 'package:soundest/components/player.dart';
 import 'package:soundest/editItem.dart';
 import 'package:soundest/utils/prefs.dart';
 import 'package:soundest/utils/showSnackBar.dart';
@@ -10,31 +12,21 @@ import 'package:soundest/themes/dark.dart';
 
 // Элемент одного трека
 class Item extends StatefulWidget{
-  const Item({super.key, required this.login, required this.item, required this.setSong, required this.type, this.uploadItem, this.removeFromCloud_, this.removeItem, this.removeFromPlaylist_});
+  const Item({super.key, required this.login, required this.item, required this.type});
   final login;
   final item;
-  final setSong;
   final String type;
-  final uploadItem;
-  final removeFromCloud_;
-  final removeItem;
-  final removeFromPlaylist_;
 
   @override
-  State<Item> createState() => _Item(login: login, item: item, setSong: setSong, type: type, uploadItem: uploadItem, removeFromCloud_: removeFromCloud_, removeItem: removeItem, removeFromPlaylist_: removeFromPlaylist_);
+  State<Item> createState() => _Item(login: login, item: item, type: type);
 
 }
 
 class _Item extends State<Item>{
-  _Item({required this.item, required this.login, required this.setSong, required this.type, this.uploadItem, this.removeFromCloud_, this.removeItem, this.removeFromPlaylist_});
+  _Item({required this.item, required this.login, required this.type});
   final login;
   final item;
-  final setSong;
   final String type;
-  final uploadItem;
-  final removeFromCloud_;
-  final removeItem;
-  final removeFromPlaylist_;
 
   bool isLocal = false;
   bool isUploaded = false;
@@ -71,12 +63,15 @@ class _Item extends State<Item>{
 
   @override
   Widget build(BuildContext context){
+    final PlayerManager playerManager = Provider.of<PlayerManager>(context);
+    final setSong = playerManager.setSong;
+    final uploadItem = playerManager.uploadItem;
+    final removeItem = playerManager.removeItem;
+    final removeFromCloud_ = playerManager.removeFromCloud_;
+    final removeFromPlaylist_ = playerManager.removeFromPlaylist_()
+
     return Container(
       decoration: BoxDecoration(
-        // border: Border.all(
-        //   width: 1,
-        //   color: Theme.of(context).primaryColor
-        // ),
         borderRadius: BorderRadius.circular(5),
       ),
       child: InkWell (
@@ -85,14 +80,6 @@ class _Item extends State<Item>{
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           child: Row(
             children: [
-              // Container(
-              //   width: 100, 
-              //   height: 100,
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(10),
-              //     image: DecorationImage(image: MemoryImage(item['albumArt']))
-              //   ),  
-              // ),
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.all(8),
