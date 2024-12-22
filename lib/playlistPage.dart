@@ -137,7 +137,7 @@ class _PlaylistPage extends State<PlaylistPage>{
                         List<Widget> children;
                         if (snapshot.hasData){
                           final data = snapshot.data;
-                          children = List.generate(data!.length, (index) => Item(item: data[index], login: login, type: 'playlist', setSong: setSong, removeFromPlaylist_: removeFromPlaylist_));
+                          children = List.generate(data!.length, (index) => Item(item: data[index], login: login, type: 'playlist'));
                         } else if (snapshot.hasError){
                           final error = snapshot.error;
                           children = [
@@ -166,7 +166,7 @@ class _PlaylistPage extends State<PlaylistPage>{
                   if (data!.isNotEmpty){
                     children = SizedBox(
                       height: 101,
-                      child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
+                      child: Player()
                     );
                   }
                 }

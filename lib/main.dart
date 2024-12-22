@@ -34,7 +34,7 @@ class Soundest extends StatelessWidget {
   Widget build(BuildContext context){
     return MultiProvider(
       providers: [
-        Provider(create: (context) => PlayerManager(context))
+        ChangeNotifierProvider(create: (context) => PlayerManager(context))
       ],
       child: MaterialApp(
         title: 'Soundest',

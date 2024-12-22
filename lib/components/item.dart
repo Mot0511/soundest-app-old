@@ -68,7 +68,6 @@ class _Item extends State<Item>{
     final uploadItem = playerManager.uploadItem;
     final removeItem = playerManager.removeItem;
     final removeFromCloud_ = playerManager.removeFromCloud_;
-    final removeFromPlaylist_ = playerManager.removeFromPlaylist_()
 
     return Container(
       decoration: BoxDecoration(
@@ -161,7 +160,8 @@ class _Item extends State<Item>{
                       PopupMenuItem(
                         value: 1,
                         child: Text('Удалить из плейлиста', style: Theme.of(context).textTheme.labelMedium),
-                        onTap: () => removeFromPlaylist_(item['id']),
+                        onTap: () => {},
+                        // onTap: () => removeFromPlaylist_(item['id']),
                       ),
                     PopupMenuItem(
                       value: 2,

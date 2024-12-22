@@ -24,8 +24,8 @@ class _Home extends State<Home>{
   @override
   Widget build(BuildContext context){
     final PlayerManager playerManager = Provider.of<PlayerManager>(context);
-    late final Future<List<Map>> items = playerManager.items;
     playerManager.initItems();
+    late final Future<List<Map>> items = playerManager.items;
 
 
     return Column (
