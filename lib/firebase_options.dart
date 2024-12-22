@@ -94,4 +94,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'soundest-95e52.appspot.com',
     measurementId: 'G-7VD2CQMRQE',
   );
+
 }

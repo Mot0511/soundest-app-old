@@ -18,7 +18,7 @@ class Player extends StatelessWidget {
         player.builderCurrentPosition(
           builder: (context, current) {
             return Slider(
-              max: duration,
+              max: duration + 1.0,
               value: current.inSeconds.toDouble(),
               onChanged: (double value) async {
                 player.seek(Duration(seconds: value.toInt()));

@@ -37,7 +37,6 @@ class _Home extends State<Home>{
     setSong(data[step]);
   }
   void setSong(Map item) async {
-
     final metas = Metas(
       title: item['title'],
       artist: item['author'],
@@ -163,21 +162,24 @@ class _Home extends State<Home>{
             );
           }),
         ),
-        FutureBuilder(
-          future: items,
-          builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
-            Widget children = const SizedBox.shrink();
-            if (snapshot.hasData){
-              final data = snapshot.data;
-              if (data!.isNotEmpty){
-                children = SizedBox(
-                  height: 101,
-                  child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
-                );
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: FutureBuilder(
+            future: items,
+            builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
+              Widget children = const SizedBox.shrink();
+              if (snapshot.hasData){
+                final data = snapshot.data;
+                if (data!.isNotEmpty){
+                  children = SizedBox(
+                    height: 101,
+                    child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
+                  );
+                }
               }
+              return children;
             }
-            return children;
-          }
+          )
         )
       ],
     );

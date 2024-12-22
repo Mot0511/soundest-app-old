@@ -1,3 +1,4 @@
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:soundest/settings.dart';
@@ -115,6 +116,7 @@ class _NavBar extends State<NavBar>{
                 iconColor: Theme.of(context).primaryColor,
                 color: Theme.of(context).cardColor,
                 itemBuilder: (BuildContext context) => [
+                if (Platform.isAndroid)
                 PopupMenuItem(
                   onTap: () => Navigator.push(context, MaterialPageRoute(
                     builder: (context) => Settings())),
@@ -133,7 +135,7 @@ class _NavBar extends State<NavBar>{
         ]
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(0),
         child: (isSigned == true 
           ? Pages.elementAt(page) 
           : isSigned == false 

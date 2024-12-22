@@ -103,11 +103,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "246221281013-2eulul0des9jldqprm4httspfe5s91bn.apps.googleusercontent.com",
+          "client_id": "246221281013-4l4q80nm079fl0ptc484f1ojskgs749d.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ms.sndst",
-            "certificate_hash": "d1673c3a15b7a906f41faec0139ca185a7c5e48f"
+            "certificate_hash": "1e574669004c5ed0f1298a127c63c2e7455dab89"
           }
         },
         {

@@ -8,37 +8,43 @@ import 'package:soundest/utils/prefs.dart';
 // Страница с кнопкой для входа в аккаунт
 class Signin extends StatelessWidget {
   const Signin({super.key, required this.setIsSigned});
-  final setIsSigned;
-
+  final setIsSigned; 
   void signin () async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser != null) {
+      GoogleSignInAuthentication? googleAuth =
+          await (await GoogleSignIn(
+          scopes: ["profile", "email"],
+      ).signIn())
+          ?.authentication;
 
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final email = userCredential.user?.email;
+      final login = email?.split('@')[0];
 
-    final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    final email = userCredential.user?.email;
-    final login = email?.split('@')[0];
+      DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login');
+      final snap = await ref.get();
+      final data = snap.value;
 
-    DatabaseReference ref = FirebaseDatabase.instance.ref('/users/$login');
-    final snap = await ref.get();
-    final data = snap.value;
-
-    if (data == null){
-      await ref.set({
-        "email": email,
-      });
-    } 
-    
-    if (login != null){
-      await setPrefs('login', login);
+      if (data == null){
+        await ref.set({
+          "email": email,
+        });
+      } 
+      
+      if (login != null){
+        await setPrefs('login', login);
+      }
+      
+      setIsSigned(true, login);
+    } else {
+      print(googleUser);
     }
-    
-    setIsSigned(true, login);
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -23,7 +25,14 @@ Future<void> downloadItem(Map item, String username, BuildContext context) async
   final author = item['author'];
   
   final fileRef = FirebaseStorage.instance.ref('$username/$songID.mp3');
-  final musicPath = await getPrefs('musicPath');
+  String? musicPath = '';
+  if (Platform.isAndroid){
+    musicPath = await getPrefs('musicPath');
+  } else {
+    final dir = await getApplicationDocumentsDirectory();
+    musicPath = dir.path;
+  }
+
   final file = File('$musicPath/$title@$author№$songID.mp3');
 
   final task = fileRef.writeToFile(file);
@@ -108,12 +117,21 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
   final audioPermission = await Permission.audio.request().isGranted;
   final manageStoragePermission = await Permission.manageExternalStorage.request().isGranted;
   if (storagePermission || audioPermission && manageStoragePermission) {
-    final musicPath = await getPrefs('musicPath');
+    String? musicPath = '';
+    if (Platform.isAndroid){
+      musicPath = await getPrefs('musicPath');
+    } else {
+      final dir = await getApplicationDocumentsDirectory();
+      musicPath = dir.path;
+    }
     if (musicPath != null) {
       final Directory dir = Directory(musicPath);
       final List<FileSystemEntity> entities = dir.listSync(recursive: true, followLinks: true);
       entities.forEach((entity) async {
         final filepath = entity.path;
+        final file = File(filepath);
+        
+        
         if (filepath.endsWith('.mp3')){
           final displayName = filepath.split('/').last;
           final songID = displayName.indexOf('№') != -1 ? int.parse(displayName.split('№')[1].split('.')[0]) : 1 + Random().nextInt(4294967296 - 1);
@@ -122,11 +140,12 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
             final title = displayName.split('@')[0];
             final author = displayName.split('@')[1].split('.')[0].split('№')[0];
             newpath = path.join(path.dirname(filepath), '$title@$author№$songID.mp3');
+            // Получение метаанных файла для получения обложки трека
             res.add({
               'id': songID,
               'title': title,
               'author': author,
-              'path': newpath
+              'path': newpath,
             });
           } else {
             final title = displayName.split('.')[0];
@@ -135,10 +154,9 @@ Future<List<Map>> getItems(String login, BuildContext context) async {
               'id': songID,
               'title': title,
               'author': '',
-              'path': newpath
+              'path': newpath,
             });
           }
-          final file = File(filepath);
           file.renameSync(newpath);
           
           

@@ -72,30 +72,38 @@ class _Item extends State<Item>{
   @override
   Widget build(BuildContext context){
     return Container(
-      width: 1000,
-      height: 62,
-      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        border: Border.all(
-          width: 1,
-          color: Theme.of(context).primaryColor
-        ),
+        // border: Border.all(
+        //   width: 1,
+        //   color: Theme.of(context).primaryColor
+        // ),
         borderRadius: BorderRadius.circular(5),
       ),
       child: InkWell (
-        onTap: () => setSong(item),
+        onTap: () => setSong(item), 
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           child: Row(
             children: [
+              // Container(
+              //   width: 100, 
+              //   height: 100,
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(10),
+              //     image: DecorationImage(image: MemoryImage(item['albumArt']))
+              //   ),  
+              // ),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(item['title'], style: const TextStyle(fontSize: 15)),
-                    Text(item['author'], style: const TextStyle(fontSize: 13)),
-                  ]
-                ),
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(item['title'], style: const TextStyle(fontSize: 17)),
+                      Text(item['author'], style: const TextStyle(fontSize: 14)),
+                    ]
+                  ),
+                )
               ),
               PopupMenuButton(
                 iconColor: Theme.of(context).primaryColor,
@@ -182,7 +190,7 @@ class _Item extends State<Item>{
                 ]),
             ]
           )
-        ) 
+        )
       )
     );
   }
