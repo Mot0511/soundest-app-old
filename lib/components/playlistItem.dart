@@ -41,12 +41,12 @@ class PlaylistItem extends StatelessWidget{
                 itemBuilder: (BuildContext context) => [
                   PopupMenuItem(
                     value: 1,
-                    child: Text('Изменить название'),
+                    child: Text('Изменить название', style: Theme.of(context).textTheme.labelMedium),
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EditPlaylist(data: name, action: 'editing', updatePlaylists: updatePlaylists))),
                   ),
                   PopupMenuItem(
                     value: 2,
-                    child: Text('Удалить'),
+                    child: Text('Удалить', style: Theme.of(context).textTheme.labelMedium),
                     onTap: () => updatePlaylists('remove', name),
                   )
                 ]
