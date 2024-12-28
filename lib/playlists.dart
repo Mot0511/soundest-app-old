@@ -45,41 +45,51 @@ class _Playlists extends State<Playlists>{
 
   @override
   Widget build(BuildContext context){
-    return Column(
-      children: [
-        Expanded(
-          child: LayoutBuilder(builder: (context, constraints){
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: FutureBuilder(
-                  future: playlists,
-                  builder: (BuildContext context, AsyncSnapshot snap){
-                    Widget res = const Column(children: [CircularProgressIndicator()]);
-                    if (snap.hasData){
-                      final data = snap.data;
-                      final List<Widget> elements = [];
-                      data.forEach((key, value){
-                        elements.add(PlaylistItem(name: key, list: value, updatePlaylists: updatePlaylists, login: login));
-                      });
-                      res = Column(
-                        children: elements,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Expanded(
+            child: LayoutBuilder(builder: (context, constraints){
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: FutureBuilder(
+                    future: playlists,
+                    builder: (BuildContext context, AsyncSnapshot snap){
+                      List<Widget> children;
+                      if (snap.hasData){
+                        final data = snap.data;
+                        final List<Widget> elements = [];
+                        data.forEach((key, value){
+                          elements.add(PlaylistItem(name: key, list: value, updatePlaylists: updatePlaylists, login: login));
+                        });
+                        children = elements;
+                      } else {
+                        children = [
+                          Padding(
+                            padding: EdgeInsets.all(15),
+                            child: CircularProgressIndicator(),
+                          )
+                        ];
+                      }
+                      return Column(
+                        children: children,
                       );
                     }
-                    return res;
-                  }
+                  )
                 )
-              )
-            );
-          })
-        ),
-        Center(
-          child: ElevatedButton(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EditPlaylist(data: '', action: 'creating', updatePlaylists: updatePlaylists))),
-            child: const Text('Добавить плейлист'),
+              );
+            })
+          ),
+          Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EditPlaylist(data: '', action: 'creating', updatePlaylists: updatePlaylists))),
+              child: const Text('Добавить плейлист'),
+            )
           )
-        )
-      ]
+        ]
+      )
     );
   }
 }

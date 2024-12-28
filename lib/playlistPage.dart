@@ -93,7 +93,11 @@ class _PlaylistPage extends State<PlaylistPage>{
       }
     }
     player.playlistAudioFinished.listen((_) => leaf());
-    player.current.listen((currentSong) => setState(() => duration = currentSong!.audio.duration.inSeconds.toDouble()));
+    player.current.listen((currentSong) => setState(() {
+      if (currentSong != null) {
+        duration = currentSong.audio.duration.inSeconds.toDouble();
+      }
+    }));
   }
 
   void play() {
@@ -122,59 +126,61 @@ class _PlaylistPage extends State<PlaylistPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(name)),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column (
-          children: [
-            Expanded(
-              child: LayoutBuilder(builder: (context, constraints){
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                    child: FutureBuilder<List<Map>>(
-                      future: items,
-                      builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
-                        List<Widget> children;
-                        if (snapshot.hasData){
-                          final data = snapshot.data;
-                          children = List.generate(data!.length, (index) => Item(item: data[index], login: login, type: 'playlist', setSong: setSong, removeFromPlaylist_: removeFromPlaylist_));
-                        } else if (snapshot.hasError){
-                          final error = snapshot.error;
-                          children = [
-                            const Center(child: Text('Произошла ошибка', style: TextStyle(fontSize: 30)))
-                          ];
-                        } else {
-                          children = [
-                            const Center(child: CircularProgressIndicator())
-                          ];
-                        }
-                        return Column(
-                          children: children,
-                        );
+      body: Column (
+        children: [
+          Expanded(
+            child: LayoutBuilder(builder: (context, constraints){
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: FutureBuilder<List<Map>>(
+                    future: items,
+                    builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
+                      List<Widget> children;
+                      if (snapshot.hasData){
+                        final data = snapshot.data;
+                        children = List.generate(data!.length, (index) => Item(item: data[index], login: login, type: 'playlist', setSong: setSong, removeFromPlaylist_: removeFromPlaylist_));
+                      } else if (snapshot.hasError){
+                        final error = snapshot.error;
+                        children = [
+                          const Center(child: Text('Произошла ошибка', style: TextStyle(fontSize: 30)))
+                        ];
+                      } else {
+                        children = [
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(15),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        ];
                       }
-                    )
+                      return Column(
+                        children: children,
+                      );
+                    }
                   )
-                );
-              }),
-            ),
-            FutureBuilder(
-              future: items,
-              builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
-                Widget children = const SizedBox.shrink();
-                if (snapshot.hasData){
-                  final data = snapshot.data;
-                  if (data!.isNotEmpty){
-                    children = SizedBox(
-                      height: 101,
-                      child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
-                    );
-                  }
+                )
+              );
+            }),
+          ),
+          FutureBuilder(
+            future: items,
+            builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot){
+              Widget children = const SizedBox.shrink();
+              if (snapshot.hasData){
+                final data = snapshot.data;
+                if (data!.isNotEmpty){
+                  children = SizedBox(
+                    height: 101,
+                    child: Player(player: player, duration: duration, item: data[step], leaf: leaf, play: play, isPlay: isPlay)
+                  );
                 }
-                return children;
               }
-            )
-          ],
-        ),
+              return children;
+            }
+          )
+        ],
       ),
     );
   }

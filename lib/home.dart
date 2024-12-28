@@ -89,7 +89,11 @@ class _Home extends State<Home>{
       }
     }
     player.playlistAudioFinished.listen((_) => leaf());
-    player.current.listen((currentSong) => setState(() => duration = currentSong!.audio.duration.inSeconds.toDouble()));
+    player.current.listen((currentSong) => setState(() {
+      if (currentSong != null) {
+        duration = currentSong.audio.duration.inSeconds.toDouble();
+      }
+    }));
   }
 
   void play() {
@@ -149,7 +153,10 @@ class _Home extends State<Home>{
                       children = [
                         const Align(
                           alignment: Alignment.center,
-                          child: CircularProgressIndicator()
+                          child: Padding(
+                            padding: EdgeInsets.all(15),
+                            child: CircularProgressIndicator(),
+                          )
                         )
                       ];
                     }
